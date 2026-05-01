@@ -49,17 +49,17 @@ flowchart LR
     Validate["2. Validation<br/>Check the rules make sense"]:::check
     Compile["3. Compiler<br/>Turn rules into 3 policy files"]:::build
     Policies["4. Policies<br/>Transport + O-Cloud + O-RAN metadata"]:::files
-    Graph["5. Graph<br/>Build a small map of surviving paths"]:::graph
+    PathGraph["5. Graph<br/>Build a small map of surviving paths"]:::graphStep
     Verify["6. Verifier<br/>Check allowed and blocked paths"]:::check
     Results["7. Results<br/>Reports + E1-E5 evidence"]:::result
 
-    Intent --> Validate --> Compile --> Policies --> Graph --> Verify --> Results
+    Intent --> Validate --> Compile --> Policies --> PathGraph --> Verify --> Results
 
     classDef intent fill:#fff4b8,stroke:#d4a000,color:#5c4500;
     classDef check fill:#cfe8ff,stroke:#3c78d8,color:#123a73;
     classDef build fill:#ffd6cc,stroke:#d96c4f,color:#6b2617;
     classDef files fill:#d8f5d0,stroke:#4d9b57,color:#1f5b2a;
-    classDef graph fill:#e7d9ff,stroke:#7a57c2,color:#40206e;
+    classDef graphStep fill:#e7d9ff,stroke:#7a57c2,color:#40206e;
     classDef result fill:#ffe2f1,stroke:#cc4c8a,color:#7a1c4d;
 ```
 
