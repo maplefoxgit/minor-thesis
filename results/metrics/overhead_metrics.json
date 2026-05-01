@@ -4,26 +4,26 @@
   "status": "pass",
   "validation_time": {
     "stage": "validation",
-    "wall_clock_seconds": 0.019924833992263302,
-    "cpu_seconds": 0.019912000000000013,
-    "peak_python_tracemalloc_bytes": 29404
+    "wall_clock_seconds": 0.01996420801151544,
+    "cpu_seconds": 0.019951999999999998,
+    "peak_python_tracemalloc_bytes": 29800
   },
   "compile_time": {
     "stage": "compile",
-    "wall_clock_seconds": 0.02167300001019612,
-    "cpu_seconds": 0.021657999999999983,
-    "peak_python_tracemalloc_bytes": 147781
+    "wall_clock_seconds": 0.021958666999125853,
+    "cpu_seconds": 0.021932000000000007,
+    "peak_python_tracemalloc_bytes": 147132
   },
   "graph_construction_time": {
     "stage": "graph_construction",
-    "wall_clock_seconds": 0.004288833006285131,
-    "cpu_seconds": 0.004288000000000014,
+    "wall_clock_seconds": 0.004385582986287773,
+    "cpu_seconds": 0.004380999999999996,
     "peak_python_tracemalloc_bytes": 208254
   },
   "verification_time": {
     "stage": "verification",
-    "wall_clock_seconds": 0.00567245899583213,
-    "cpu_seconds": 0.005671000000000009,
+    "wall_clock_seconds": 0.005782249994808808,
+    "cpu_seconds": 0.005773,
     "peak_python_tracemalloc_bytes": 208222
   },
   "generated_policy_file_sizes_bytes": {
@@ -42,7 +42,7 @@
   "graph_edge_count": 5,
   "peak_python_tracemalloc_bytes_max": 208254,
   "memory_measurement_basis": "Python tracemalloc peak bytes (not process RSS)",
-  "overall_wall_clock_seconds": 0.05155912600457668,
-  "overall_cpu_seconds": 0.05152900000000002,
+  "overall_wall_clock_seconds": 0.05209070799173787,
+  "overall_cpu_seconds": 0.052038,
   "local_overhead_statement": "These measurements report modest local proof-of-concept overhead only. They do not establish production scalability."
 }
