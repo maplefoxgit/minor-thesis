@@ -1,0 +1,61 @@
+topology_id: bad-missing-default-deny
+nodes:
+  - node_id: slice_a_workload
+    layer: workload
+    slice_id: slice_a
+    namespace: ns-slice-a
+    transport_segment: tn_segment_slice_a
+  - node_id: slice_b_workload
+    layer: workload
+    slice_id: slice_b
+    namespace: ns-slice-b
+    transport_segment: tn_segment_slice_b
+  - node_id: tn_segment_slice_a
+    layer: transport
+    transport_segment: tn_segment_slice_a
+  - node_id: tn_segment_slice_b
+    layer: transport
+    transport_segment: tn_segment_slice_b
+  - node_id: tn_segment_shared
+    layer: transport
+    transport_segment: tn_segment_shared
+  - node_id: shared_auth_log
+    layer: shared_service
+    namespace: ns-shared-auth-log
+    transport_segment: tn_segment_shared
+    transit_allowed: false
+  - node_id: oran_policy_slice_a
+    layer: policy
+    slice_id: slice_a
+    namespace: ns-slice-a
+  - node_id: oran_policy_slice_b
+    layer: policy
+    slice_id: slice_b
+    namespace: ns-slice-b
+edges:
+  - source: oran_policy_slice_a
+    destination: slice_a_workload
+    relation: governs
+  - source: oran_policy_slice_b
+    destination: slice_b_workload
+    relation: governs
+  - source: slice_a_workload
+    destination: tn_segment_slice_a
+    relation: attached_to
+  - source: slice_b_workload
+    destination: tn_segment_slice_b
+    relation: attached_to
+  - source: tn_segment_slice_a
+    destination: tn_segment_shared
+    relation: routed_via
+  - source: tn_segment_slice_b
+    destination: tn_segment_shared
+    relation: routed_via
+  - source: tn_segment_shared
+    destination: shared_auth_log
+    relation: terminates_at
+default_deny:
+  enforced: false
+  controls:
+    - inter_slice
+    - transport_cross_slice

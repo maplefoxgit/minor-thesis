@@ -1,0 +1,240 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/slice_security_intent.schema.json",
+  "title": "Bounded Slice Security Intent",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "thesis_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scenario_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "slices": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/slice"
+      }
+    },
+    "shared_services": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/shared_service"
+      }
+    },
+    "access_policies": {
+      "$ref": "#/$defs/access_policies"
+    },
+    "verification_requirements": {
+      "$ref": "#/$defs/verification_requirements"
+    }
+  },
+  "required": [
+    "slices",
+    "shared_services",
+    "access_policies",
+    "verification_requirements"
+  ],
+  "anyOf": [
+    {
+      "required": ["thesis_id"]
+    },
+    {
+      "required": ["scenario_id"]
+    }
+  ],
+  "$defs": {
+    "label": {
+      "type": "string",
+      "pattern": "^[a-z0-9]([-a-z0-9_]*[a-z0-9])?$"
+    },
+    "snssai": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sst": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "sd": {
+          "type": "string",
+          "pattern": "^[A-Fa-f0-9]{6}$"
+        }
+      },
+      "required": ["sst", "sd"]
+    },
+    "workload": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "workload_id": {
+          "$ref": "#/$defs/label"
+        },
+        "endpoint": {
+          "$ref": "#/$defs/label"
+        }
+      },
+      "required": ["workload_id", "endpoint"]
+    },
+    "slice": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "slice_id": {
+          "$ref": "#/$defs/label"
+        },
+        "snssai": {
+          "$ref": "#/$defs/snssai"
+        },
+        "ocloud_namespace": {
+          "$ref": "#/$defs/label"
+        },
+        "transport_segment": {
+          "type": "string"
+        },
+        "workloads": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/workload"
+          }
+        }
+      },
+      "required": [
+        "slice_id",
+        "snssai",
+        "ocloud_namespace",
+        "transport_segment",
+        "workloads"
+      ]
+    },
+    "shared_service": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "service_id": {
+          "$ref": "#/$defs/label"
+        },
+        "service_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "endpoint": {
+          "$ref": "#/$defs/label"
+        },
+        "transport_segment": {
+          "type": "string"
+        },
+        "transit_allowed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "service_id",
+        "service_type",
+        "endpoint",
+        "transport_segment",
+        "transit_allowed"
+      ]
+    },
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/label"
+        },
+        "destination": {
+          "$ref": "#/$defs/label"
+        },
+        "direction": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["source", "destination", "direction"]
+    },
+    "default_deny": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "inter_slice": {
+          "type": "boolean"
+        },
+        "intra_slice_unspecified": {
+          "type": "boolean"
+        },
+        "shared_service_transit": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "inter_slice",
+        "intra_slice_unspecified",
+        "shared_service_transit"
+      ]
+    },
+    "access_policies": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "allowed_shared_service_access": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/rule"
+          }
+        },
+        "forbidden_inter_slice_communication": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/rule"
+          }
+        },
+        "default_deny": {
+          "$ref": "#/$defs/default_deny"
+        }
+      },
+      "required": [
+        "allowed_shared_service_access",
+        "forbidden_inter_slice_communication",
+        "default_deny"
+      ]
+    },
+    "verification_requirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "static_graph_reachability_only": {
+          "type": "boolean"
+        },
+        "require_two_slice_boundary": {
+          "type": "boolean"
+        },
+        "require_shared_auth_log_terminal": {
+          "type": "boolean"
+        },
+        "require_default_deny": {
+          "type": "boolean"
+        },
+        "require_transport_segment_isolation": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "static_graph_reachability_only",
+        "require_two_slice_boundary",
+        "require_shared_auth_log_terminal",
+        "require_default_deny",
+        "require_transport_segment_isolation"
+      ]
+    }
+  }
+}

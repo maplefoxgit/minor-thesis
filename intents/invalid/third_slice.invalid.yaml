@@ -1,0 +1,60 @@
+thesis_id: invalid-third-slice
+slices:
+  - slice_id: slice_a
+    snssai:
+      sst: 1
+      sd: "000001"
+    ocloud_namespace: ns-slice-a
+    transport_segment: tn_segment_slice_a
+    workloads:
+      - workload_id: slice_a_workload
+        endpoint: slice_a_workload
+  - slice_id: slice_b
+    snssai:
+      sst: 1
+      sd: "000002"
+    ocloud_namespace: ns-slice-b
+    transport_segment: tn_segment_slice_b
+    workloads:
+      - workload_id: slice_b_workload
+        endpoint: slice_b_workload
+  - slice_id: slice_c
+    snssai:
+      sst: 1
+      sd: "000003"
+    ocloud_namespace: ns-slice-c
+    transport_segment: tn_segment_slice_c
+    workloads:
+      - workload_id: slice_c_workload
+        endpoint: slice_c_workload
+shared_services:
+  - service_id: shared_auth_log
+    service_type: authentication_logging
+    endpoint: shared_auth_log
+    transport_segment: tn_segment_shared
+    transit_allowed: false
+access_policies:
+  allowed_shared_service_access:
+    - source: slice_a_workload
+      destination: shared_auth_log
+      direction: source_to_destination
+    - source: slice_b_workload
+      destination: shared_auth_log
+      direction: source_to_destination
+  forbidden_inter_slice_communication:
+    - source: slice_a_workload
+      destination: slice_b_workload
+      direction: source_to_destination
+    - source: slice_b_workload
+      destination: slice_a_workload
+      direction: source_to_destination
+  default_deny:
+    inter_slice: true
+    intra_slice_unspecified: true
+    shared_service_transit: true
+verification_requirements:
+  static_graph_reachability_only: true
+  require_two_slice_boundary: true
+  require_shared_auth_log_terminal: true
+  require_default_deny: true
+  require_transport_segment_isolation: true
