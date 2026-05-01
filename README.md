@@ -63,6 +63,22 @@ make run-all
 python experiments/run_all_experiments.py
 ```
 
+## Examples / Beginner-Friendly Guides
+
+If you want an easier on-ramp before diving into the thesis-oriented details, start here:
+
+- [`docs/examples_index.md`](docs/examples_index.md)
+- [`examples/universal-template/README.md`](examples/universal-template/README.md)
+- [`examples/hospital-example/README.md`](examples/hospital-example/README.md)
+
+These guides are additive teaching layers. They do not replace the current bounded thesis framing, and they do not widen the repository's claim.
+
+## Where To Start If You Are New
+
+- Read [`examples/hospital-example/README.md`](examples/hospital-example/README.md) for the friendliest ELI5-style walkthrough.
+- Read [`examples/universal-template/README.md`](examples/universal-template/README.md) for the domain-neutral reusable pattern.
+- Come back to this main README when you want the exact commands, artefacts, and thesis boundaries.
+
 ## Repository Structure
 
 ```text
@@ -72,6 +88,7 @@ python experiments/run_all_experiments.py
 ├── Makefile
 ├── schemas/
 ├── intents/
+├── examples/
 ├── topology/
 ├── policies/generated/
 ├── verifier/queries/
