@@ -4,6 +4,7 @@ import argparse
 from pathlib import Path
 from typing import Sequence
 
+from .compiler import compile_policy_bundle
 from .io import load_json_file, load_yaml_file
 from .validation import (
     DocumentValidationError,
@@ -36,6 +37,20 @@ def build_parser() -> argparse.ArgumentParser:
     )
     validate_topology.set_defaults(func=_run_validate_topology)
 
+    compile_parser = subparsers.add_parser(
+        "compile",
+        help="Compile deterministic representational policy artefacts.",
+    )
+    compile_parser.add_argument("--schema", required=True, help="Path to the JSON Schema.")
+    compile_parser.add_argument("--intent", required=True, help="Path to the YAML intent.")
+    compile_parser.add_argument(
+        "--topology", required=True, help="Path to the YAML topology."
+    )
+    compile_parser.add_argument(
+        "--out", required=True, help="Output directory for generated artefacts."
+    )
+    compile_parser.set_defaults(func=_run_compile)
+
     return parser
 
 
@@ -61,4 +76,15 @@ def _run_validate_topology(args: argparse.Namespace) -> int:
     topology = load_yaml_file(Path(args.topology))
     validate_topology_document(topology)
     print(f"Topology validation passed: {args.topology}")
+    return 0
+
+
+def _run_compile(args: argparse.Namespace) -> int:
+    compile_policy_bundle(
+        schema_path=Path(args.schema),
+        intent_path=Path(args.intent),
+        topology_path=Path(args.topology),
+        output_directory=Path(args.out),
+    )
+    print(f"Compilation passed: {args.out}")
     return 0

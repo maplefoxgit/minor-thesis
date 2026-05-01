@@ -1,0 +1,23 @@
+policy_type: ocloud_microsegmentation
+default_deny: true
+workloads:
+- slice_a_workload
+- slice_b_workload
+- shared_auth_log
+allowed_flows:
+- source: slice_a_workload
+  destination: shared_auth_log
+- source: slice_b_workload
+  destination: shared_auth_log
+forbidden_flows:
+- source: slice_a_workload
+  destination: slice_b_workload
+- source: slice_b_workload
+  destination: slice_a_workload
+shared_service_metadata:
+  name: shared_auth_log
+  transit_allowed: false
+provenance:
+  intent_identity_field: thesis_id
+  intent_identity_value: RQ1-bounded-two-slice-intent
+  validation_state: validated

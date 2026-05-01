@@ -1,0 +1,17 @@
+{
+  "artifact_count": 3,
+  "generated_policy_artifacts": [
+    {
+      "artifact": "ocloud_microsegmentation.generated.yaml",
+      "sha256": "721ae48970260417266acd1a3032fc153708822816fbc76c14871b6dc13a90ab"
+    },
+    {
+      "artifact": "oran_slice_policy.generated.json",
+      "sha256": "ba09739722df37fafc3c601d75ef4ba146f6189b7624c97c117142472e453f33"
+    },
+    {
+      "artifact": "transport_policy.generated.json",
+      "sha256": "8fa30f637b66293d34e56d75f4fc6470fc455d7d9f4d987ef5f22b497ee571a5"
+    }
+  ]
+}
