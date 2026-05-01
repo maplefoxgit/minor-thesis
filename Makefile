@@ -1,4 +1,4 @@
-.PHONY: install test validate compile verify run-all clean-generated
+.PHONY: install test validate compile verify experiments run-all clean-generated
 
 VENV := .venv
 PYTHON := $(VENV)/bin/python
@@ -26,11 +26,15 @@ compile: $(INSTALL_STAMP)
 verify: $(INSTALL_STAMP)
 	$(PYTHON) -m oran_slice_security verify --topology topology/base_topology.yaml --policies policies/generated --queries verifier/queries/baseline_queries.yaml --out results/reports
 
+experiments: $(INSTALL_STAMP)
+	$(PYTHON) experiments/run_all_experiments.py
+
 run-all: $(INSTALL_STAMP)
 	$(MAKE) validate
 	$(MAKE) compile
 	$(MAKE) verify
 	$(MAKE) test
+	$(MAKE) experiments
 
 clean-generated:
 	rm -f policies/generated/transport_policy.generated.json

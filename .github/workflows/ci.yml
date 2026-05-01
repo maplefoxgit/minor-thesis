@@ -1,0 +1,35 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  bounded-proof-of-concept:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: make install
+
+      - name: Run bounded workflow and experiments
+        shell: bash
+        run: |
+          source .venv/bin/activate
+          make validate
+          make compile
+          generated_count=$(find policies/generated -maxdepth 1 -type f -name '*.generated.*' | wc -l | tr -d ' ')
+          test "$generated_count" -eq 3
+          make verify
+          make test
+          python experiments/run_all_experiments.py
+          generated_count=$(find policies/generated -maxdepth 1 -type f -name '*.generated.*' | wc -l | tr -d ' ')
+          test "$generated_count" -eq 3

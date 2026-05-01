@@ -1,0 +1,353 @@
+{
+  "overall_status": "pass",
+  "pass_count": 5,
+  "fail_count": 0,
+  "experiments": {
+    "E1": {
+      "experiment_id": "E1",
+      "title": "Schema expressiveness",
+      "status": "pass",
+      "schema_coverage": 1.0,
+      "covered_case_count": 7,
+      "required_case_count": 7,
+      "ambiguity_count": 1,
+      "unsupported_case_count": 0,
+      "case_results": [
+        {
+          "case_id": "valid_intent",
+          "status": "pass",
+          "reason": "valid intent accepted"
+        },
+        {
+          "case_id": "third_slice",
+          "status": "pass",
+          "reason": "exactly two slices named slice_a and slice_b are required"
+        },
+        {
+          "case_id": "missing_shared_service",
+          "status": "pass",
+          "reason": "exactly one shared service named shared_auth_log is required"
+        },
+        {
+          "case_id": "ambiguous_direction",
+          "status": "pass",
+          "reason": "ambiguous direction 'bidirectional' for rule slice_a_workload -> shared_auth_log"
+        },
+        {
+          "case_id": "conflicting_allow_deny",
+          "status": "pass",
+          "reason": "conflicting allow and deny rule for slice_a_workload -> shared_auth_log"
+        },
+        {
+          "case_id": "shared_service_transit",
+          "status": "pass",
+          "reason": "shared_auth_log must declare transit_allowed=false"
+        },
+        {
+          "case_id": "duplicate_endpoint",
+          "status": "pass",
+          "reason": "duplicate workload endpoint 'slice_a_workload' across slice_a and slice_b"
+        }
+      ]
+    },
+    "E2": {
+      "experiment_id": "E2",
+      "title": "Compiler coherence",
+      "status": "pass",
+      "policy_artifact_count": 3,
+      "policy_artifacts": [
+        "ocloud_microsegmentation.generated.yaml",
+        "oran_slice_policy.generated.json",
+        "transport_policy.generated.json"
+      ],
+      "check_results": {
+        "exact_policy_artifact_count": true,
+        "snssai_present": true,
+        "slice_ids_consistent": true,
+        "shared_auth_log_references_consistent": true,
+        "transport_segment_references_consistent": true,
+        "ocloud_namespace_labels_consistent": true,
+        "snssai_values_consistent": true,
+        "determinism_passed": true
+      },
+      "unresolved_conflict_count": 0,
+      "hashes_first_generation": {
+        "ocloud_microsegmentation.generated.yaml": "721ae48970260417266acd1a3032fc153708822816fbc76c14871b6dc13a90ab",
+        "oran_slice_policy.generated.json": "ba09739722df37fafc3c601d75ef4ba146f6189b7624c97c117142472e453f33",
+        "transport_policy.generated.json": "8fa30f637b66293d34e56d75f4fc6470fc455d7d9f4d987ef5f22b497ee571a5"
+      },
+      "hashes_second_generation": {
+        "ocloud_microsegmentation.generated.yaml": "721ae48970260417266acd1a3032fc153708822816fbc76c14871b6dc13a90ab",
+        "oran_slice_policy.generated.json": "ba09739722df37fafc3c601d75ef4ba146f6189b7624c97c117142472e453f33",
+        "transport_policy.generated.json": "8fa30f637b66293d34e56d75f4fc6470fc455d7d9f4d987ef5f22b497ee571a5"
+      }
+    },
+    "E3": {
+      "experiment_id": "E3",
+      "title": "Reachability verification",
+      "status": "pass",
+      "policies_directory": "/Users/ryan/Documents/Minor-Thesis/policies/generated",
+      "required_reachable_pass_count": 2,
+      "forbidden_unreachable_pass_count": 4,
+      "shared_auth_log_not_transit": true,
+      "verification_report": {
+        "overall_status": "pass",
+        "required_reachable": [
+          {
+            "source": "slice_a_workload",
+            "destination": "shared_auth_log",
+            "status": "pass",
+            "path": [
+              "slice_a_workload",
+              "tn_segment_slice_a",
+              "tn_segment_shared",
+              "shared_auth_log"
+            ],
+            "edge_provenance": [
+              {
+                "source": "slice_a_workload",
+                "destination": "tn_segment_slice_a",
+                "provenance": [
+                  "topology",
+                  "ocloud_microsegmentation",
+                  "oran_slice_policy"
+                ]
+              },
+              {
+                "source": "tn_segment_slice_a",
+                "destination": "tn_segment_shared",
+                "provenance": [
+                  "topology",
+                  "transport_policy",
+                  "oran_slice_policy"
+                ]
+              },
+              {
+                "source": "tn_segment_shared",
+                "destination": "shared_auth_log",
+                "provenance": [
+                  "topology",
+                  "ocloud_microsegmentation",
+                  "oran_slice_policy"
+                ]
+              }
+            ]
+          },
+          {
+            "source": "slice_b_workload",
+            "destination": "shared_auth_log",
+            "status": "pass",
+            "path": [
+              "slice_b_workload",
+              "tn_segment_slice_b",
+              "tn_segment_shared",
+              "shared_auth_log"
+            ],
+            "edge_provenance": [
+              {
+                "source": "slice_b_workload",
+                "destination": "tn_segment_slice_b",
+                "provenance": [
+                  "topology",
+                  "ocloud_microsegmentation",
+                  "oran_slice_policy"
+                ]
+              },
+              {
+                "source": "tn_segment_slice_b",
+                "destination": "tn_segment_shared",
+                "provenance": [
+                  "topology",
+                  "transport_policy",
+                  "oran_slice_policy"
+                ]
+              },
+              {
+                "source": "tn_segment_shared",
+                "destination": "shared_auth_log",
+                "provenance": [
+                  "topology",
+                  "ocloud_microsegmentation",
+                  "oran_slice_policy"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbidden_unreachable": [
+          {
+            "source": "slice_a_workload",
+            "destination": "slice_b_workload",
+            "status": "pass",
+            "violation_path": null,
+            "edge_provenance": []
+          },
+          {
+            "source": "slice_b_workload",
+            "destination": "slice_a_workload",
+            "status": "pass",
+            "violation_path": null,
+            "edge_provenance": []
+          },
+          {
+            "source": "tn_segment_slice_a",
+            "destination": "tn_segment_slice_b",
+            "status": "pass",
+            "violation_path": null,
+            "edge_provenance": []
+          },
+          {
+            "source": "tn_segment_slice_b",
+            "destination": "tn_segment_slice_a",
+            "status": "pass",
+            "violation_path": null,
+            "edge_provenance": []
+          }
+        ],
+        "terminal_service_transit": [
+          {
+            "service": "shared_auth_log",
+            "status": "pass",
+            "outgoing_edges": [],
+            "violation_paths": []
+          }
+        ],
+        "paths_found_for_reachable_paths": [
+          {
+            "source": "slice_a_workload",
+            "destination": "shared_auth_log",
+            "path": [
+              "slice_a_workload",
+              "tn_segment_slice_a",
+              "tn_segment_shared",
+              "shared_auth_log"
+            ]
+          },
+          {
+            "source": "slice_b_workload",
+            "destination": "shared_auth_log",
+            "path": [
+              "slice_b_workload",
+              "tn_segment_slice_b",
+              "tn_segment_shared",
+              "shared_auth_log"
+            ]
+          }
+        ],
+        "paths_found_for_violations": [],
+        "edge_provenance": {
+          "slice_a_workload->tn_segment_slice_a": [
+            "topology",
+            "ocloud_microsegmentation",
+            "oran_slice_policy"
+          ],
+          "slice_b_workload->tn_segment_slice_b": [
+            "topology",
+            "ocloud_microsegmentation",
+            "oran_slice_policy"
+          ],
+          "tn_segment_shared->shared_auth_log": [
+            "topology",
+            "ocloud_microsegmentation",
+            "oran_slice_policy"
+          ],
+          "tn_segment_slice_a->tn_segment_shared": [
+            "topology",
+            "transport_policy",
+            "oran_slice_policy"
+          ],
+          "tn_segment_slice_b->tn_segment_shared": [
+            "topology",
+            "transport_policy",
+            "oran_slice_policy"
+          ]
+        },
+        "graph_node_count": 8,
+        "graph_edge_count": 5
+      }
+    },
+    "E4": {
+      "experiment_id": "E4",
+      "title": "Negative-control misconfiguration",
+      "status": "pass",
+      "result_directory": "/Users/ryan/Documents/Minor-Thesis/results/reports",
+      "control_results": [
+        {
+          "topology": "bad_direct_cross_slice.yaml",
+          "status": "pass",
+          "reason": "direct cross-slice workload edge is not allowed"
+        },
+        {
+          "topology": "bad_transport_cross_slice.yaml",
+          "status": "pass",
+          "reason": "node 'slice_a_workload' must set transport_segment='tn_segment_slice_a'"
+        },
+        {
+          "topology": "bad_shared_service_transit.yaml",
+          "status": "pass",
+          "reason": "shared_auth_log must declare transit_allowed=false"
+        },
+        {
+          "topology": "bad_missing_default_deny.yaml",
+          "status": "pass",
+          "reason": "topology must declare default_deny.enforced=true"
+        }
+      ]
+    },
+    "E5": {
+      "experiment_id": "E5",
+      "title": "Practical overhead",
+      "status": "pass",
+      "validation_time": {
+        "stage": "validation",
+        "wall_clock_seconds": 0.04185433400562033,
+        "cpu_seconds": 0.04184699999999997,
+        "peak_memory_bytes": 29217
+      },
+      "compile_time": {
+        "stage": "compile",
+        "wall_clock_seconds": 0.04578629200113937,
+        "cpu_seconds": 0.04575499999999999,
+        "peak_memory_bytes": 147117
+      },
+      "graph_construction_time": {
+        "stage": "graph_construction",
+        "wall_clock_seconds": 0.00914074998581782,
+        "cpu_seconds": 0.009139000000000008,
+        "peak_memory_bytes": 208254
+      },
+      "verification_time": {
+        "stage": "verification",
+        "wall_clock_seconds": 0.011784624977735803,
+        "cpu_seconds": 0.011782000000000015,
+        "peak_memory_bytes": 208222
+      },
+      "generated_policy_file_sizes_bytes": {
+        "ocloud_microsegmentation.generated.yaml": 595,
+        "oran_slice_policy.generated.json": 1081,
+        "transport_policy.generated.json": 877
+      },
+      "generated_rule_count": 10,
+      "generated_rule_breakdown": {
+        "transport_rule_count": 4,
+        "ocloud_rule_count": 4,
+        "oran_rule_count": 2,
+        "generated_rule_count": 10
+      },
+      "graph_node_count": 8,
+      "graph_edge_count": 5,
+      "peak_memory_bytes_max": 208254,
+      "overall_wall_clock_seconds": 0.10856600097031333,
+      "overall_cpu_seconds": 0.10852299999999998,
+      "local_overhead_statement": "These measurements report modest local proof-of-concept overhead only. They do not establish production scalability."
+    }
+  },
+  "bounded_claim": "The evidence supports only bounded, local, model-based validation, compilation, static non-reachability verification, negative-control rejection, and modest local overhead reporting.",
+  "result_files": {
+    "verification_report_json": "/Users/ryan/Documents/Minor-Thesis/results/reports/verification_report.json",
+    "verification_report_md": "/Users/ryan/Documents/Minor-Thesis/results/reports/verification_report.md",
+    "experiment_summary_json": "/Users/ryan/Documents/Minor-Thesis/results/reports/experiment_summary.json",
+    "experiment_summary_md": "/Users/ryan/Documents/Minor-Thesis/results/reports/experiment_summary.md",
+    "overhead_metrics_json": "/Users/ryan/Documents/Minor-Thesis/results/metrics/overhead_metrics.json"
+  }
+}
