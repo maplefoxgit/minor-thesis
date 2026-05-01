@@ -8,6 +8,7 @@ from _common import (
     OVERHEAD_METRICS_JSON,
     REPORTS_DIR,
     print_json,
+    rel,
     write_json,
     write_markdown,
 )
@@ -44,11 +45,11 @@ def run() -> dict[str, Any]:
             "local overhead reporting."
         ),
         "result_files": {
-            "verification_report_json": str(REPORTS_DIR / "verification_report.json"),
-            "verification_report_md": str(REPORTS_DIR / "verification_report.md"),
-            "experiment_summary_json": str(EXPERIMENT_SUMMARY_JSON),
-            "experiment_summary_md": str(EXPERIMENT_SUMMARY_MD),
-            "overhead_metrics_json": str(OVERHEAD_METRICS_JSON),
+            "verification_report_json": rel(REPORTS_DIR / "verification_report.json"),
+            "verification_report_md": rel(REPORTS_DIR / "verification_report.md"),
+            "experiment_summary_json": rel(EXPERIMENT_SUMMARY_JSON),
+            "experiment_summary_md": rel(EXPERIMENT_SUMMARY_MD),
+            "overhead_metrics_json": rel(OVERHEAD_METRICS_JSON),
         },
     }
     write_json(EXPERIMENT_SUMMARY_JSON, summary_document)
@@ -79,7 +80,14 @@ def render_experiment_summary_markdown(summary_document: dict[str, Any]) -> str:
 
         if experiment_id == "E1":
             lines.append(f"- Schema coverage: {result['schema_coverage']:.2f}")
-            lines.append(f"- Ambiguity count: {result['ambiguity_count']}")
+            lines.append(
+                "- Accepted-intent ambiguity count: "
+                f"{result['accepted_intent_ambiguity_count']}"
+            )
+            lines.append(
+                "- Ambiguous invalid case rejection count: "
+                f"{result['ambiguous_invalid_case_rejection_count']}"
+            )
             lines.append(f"- Unsupported case count: {result['unsupported_case_count']}")
             for case_result in result["case_results"]:
                 lines.append(
@@ -113,7 +121,9 @@ def render_experiment_summary_markdown(summary_document: dict[str, Any]) -> str:
         if experiment_id == "E4":
             for control in result["control_results"]:
                 lines.append(
-                    f"- {control['topology']}: `{control['status']}`; {control['reason']}"
+                    f"- {control['topology']}: expected=`{control['expected_result']}`, "
+                    f"actual=`{control['actual_result']}`, "
+                    f"control_passed=`{control['control_passed']}`; {control['reason']}"
                 )
 
         if experiment_id == "E5":
@@ -122,13 +132,17 @@ def render_experiment_summary_markdown(summary_document: dict[str, Any]) -> str:
             )
             lines.append(f"- Generated rule count: {result['generated_rule_count']}")
             lines.append(
-                f"- Peak memory (max stage): {result['peak_memory_bytes_max']} bytes"
+                "- Peak Python tracemalloc bytes (max stage): "
+                f"{result['peak_python_tracemalloc_bytes_max']} bytes"
             )
             lines.append(
                 f"- Overall wall-clock time: {result['overall_wall_clock_seconds']:.6f} seconds"
             )
             lines.append(
                 f"- Overall CPU time: {result['overall_cpu_seconds']:.6f} seconds"
+            )
+            lines.append(
+                f"- Memory measurement basis: {result['memory_measurement_basis']}"
             )
             lines.append(f"- Local overhead note: {result['local_overhead_statement']}")
 

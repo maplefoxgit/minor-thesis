@@ -16,7 +16,7 @@ BASE_TOPOLOGY_PATH = ROOT / "topology" / "base_topology.yaml"
 NEGATIVE_CASES = [
     ("bad_direct_cross_slice.yaml", "direct cross-slice workload edge is not allowed"),
     (
-        "bad_transport_cross_slice.yaml",
+        "bad_transport_misbinding.yaml",
         "node 'slice_a_workload' must set transport_segment='tn_segment_slice_a'",
     ),
     (
@@ -40,6 +40,26 @@ def test_base_topology_loads_and_validates() -> None:
         "slice_b_workload",
         "shared_auth_log",
     }
+
+
+def test_missing_shared_service_path_topology_is_still_structurally_valid() -> None:
+    topology = load_yaml_file(
+        ROOT / "topology" / "negative_controls" / "bad_missing_shared_service_path.yaml"
+    )
+
+    model = validate_topology_document(topology)
+
+    assert model.topology_id == "bad-missing-shared-service-path"
+
+
+def test_transport_cross_slice_edge_topology_is_still_structurally_valid() -> None:
+    topology = load_yaml_file(
+        ROOT / "topology" / "negative_controls" / "bad_transport_cross_slice_edge.yaml"
+    )
+
+    model = validate_topology_document(topology)
+
+    assert model.topology_id == "bad-transport-cross-slice-edge"
 
 
 @pytest.mark.parametrize(("fixture_name", "expected_message"), NEGATIVE_CASES)

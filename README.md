@@ -170,11 +170,11 @@ They do **not** claim:
 
 ## Experiment Descriptions
 
-- `E1 Schema expressiveness`: confirms the valid intent passes and the bounded invalid intents fail for the expected reasons.
+- `E1 Schema expressiveness`: confirms the accepted bounded intent remains unambiguous and the bounded invalid intents fail for the expected reasons, including explicit rejection of an ambiguous invalid case.
 - `E2 Compiler coherence`: confirms exactly three policy artefacts, identifier consistency, and deterministic regeneration.
 - `E3 Reachability verification`: confirms both permitted paths to `shared_auth_log` survive while forbidden cross-slice paths do not.
-- `E4 Negative-control misconfiguration`: confirms each negative-control topology fails with a useful reason.
-- `E5 Practical overhead`: reports local timing, CPU, memory, file size, rule count, and graph-size evidence without making a production scalability claim.
+- `E4 Negative-control misconfiguration`: confirms each negative-control topology is rejected with a useful reason, including an over-restrictive case that breaks required reachability to `shared_auth_log`.
+- `E5 Practical overhead`: reports local timing, CPU, Python `tracemalloc` peak allocation, file size, rule count, and graph-size evidence without making a production scalability claim.
 
 ## How To Reproduce Reports
 

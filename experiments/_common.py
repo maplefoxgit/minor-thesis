@@ -55,6 +55,14 @@ GENERATED_POLICY_FILES = [
 ]
 
 
+def rel(path: str | Path) -> str:
+    candidate = Path(path).resolve()
+    try:
+        return str(candidate.relative_to(ROOT))
+    except ValueError:
+        return str(path)
+
+
 def ensure_output_directories() -> None:
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
     METRICS_DIR.mkdir(parents=True, exist_ok=True)
@@ -154,7 +162,7 @@ def measure_stage(
         "stage": name,
         "wall_clock_seconds": wall_seconds,
         "cpu_seconds": cpu_seconds,
-        "peak_memory_bytes": peak_memory,
+        "peak_python_tracemalloc_bytes": peak_memory,
     }
     return result, metrics
 

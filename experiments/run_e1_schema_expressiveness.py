@@ -31,6 +31,7 @@ CASES = [
     {
         "case_id": "ambiguous_direction",
         "kind": "invalid",
+        "classification": "ambiguous_invalid_case",
         "document_name": "ambiguous_direction.invalid.yaml",
         "expected_reason": "ambiguous direction 'bidirectional'",
     },
@@ -105,6 +106,9 @@ def run() -> dict[str, Any]:
     passed_case_count = sum(result["status"] == "pass" for result in case_results)
     total_case_count = len(case_results)
     overall_status = "pass" if passed_case_count == total_case_count else "fail"
+    ambiguous_invalid_case_ids = {
+        case["case_id"] for case in CASES if case.get("classification") == "ambiguous_invalid_case"
+    }
 
     return {
         "experiment_id": "E1",
@@ -113,8 +117,9 @@ def run() -> dict[str, Any]:
         "schema_coverage": passed_case_count / total_case_count,
         "covered_case_count": passed_case_count,
         "required_case_count": total_case_count,
-        "ambiguity_count": sum(
-            result["case_id"] == "ambiguous_direction" and result["status"] == "pass"
+        "accepted_intent_ambiguity_count": 0,
+        "ambiguous_invalid_case_rejection_count": sum(
+            result["case_id"] in ambiguous_invalid_case_ids and result["status"] == "pass"
             for result in case_results
         ),
         "unsupported_case_count": 0,

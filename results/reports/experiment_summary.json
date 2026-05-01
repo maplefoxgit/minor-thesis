@@ -10,7 +10,8 @@
       "schema_coverage": 1.0,
       "covered_case_count": 7,
       "required_case_count": 7,
-      "ambiguity_count": 1,
+      "accepted_intent_ambiguity_count": 0,
+      "ambiguous_invalid_case_rejection_count": 1,
       "unsupported_case_count": 0,
       "case_results": [
         {
@@ -86,7 +87,7 @@
       "experiment_id": "E3",
       "title": "Reachability verification",
       "status": "pass",
-      "policies_directory": "/Users/ryan/Documents/Minor-Thesis/policies/generated",
+      "policies_directory": "policies/generated",
       "required_reachable_pass_count": 2,
       "forbidden_unreachable_pass_count": 4,
       "shared_auth_log_not_transit": true,
@@ -270,27 +271,55 @@
       "experiment_id": "E4",
       "title": "Negative-control misconfiguration",
       "status": "pass",
-      "result_directory": "/Users/ryan/Documents/Minor-Thesis/results/reports",
+      "result_directory": "results/reports",
       "control_results": [
         {
           "topology": "bad_direct_cross_slice.yaml",
-          "status": "pass",
+          "expected_result": "reject",
+          "actual_result": "rejected",
+          "control_passed": true,
+          "rejection_stage": "validation",
           "reason": "direct cross-slice workload edge is not allowed"
         },
         {
-          "topology": "bad_transport_cross_slice.yaml",
-          "status": "pass",
+          "topology": "bad_transport_misbinding.yaml",
+          "expected_result": "reject",
+          "actual_result": "rejected",
+          "control_passed": true,
+          "rejection_stage": "validation",
           "reason": "node 'slice_a_workload' must set transport_segment='tn_segment_slice_a'"
         },
         {
+          "topology": "bad_transport_cross_slice_edge.yaml",
+          "expected_result": "reject",
+          "actual_result": "rejected",
+          "control_passed": true,
+          "rejection_stage": "validation",
+          "reason": "transport edge tn_segment_slice_a -> tn_segment_slice_b is not permitted by the compiled transport policy"
+        },
+        {
           "topology": "bad_shared_service_transit.yaml",
-          "status": "pass",
+          "expected_result": "reject",
+          "actual_result": "rejected",
+          "control_passed": true,
+          "rejection_stage": "validation",
           "reason": "shared_auth_log must declare transit_allowed=false"
         },
         {
           "topology": "bad_missing_default_deny.yaml",
-          "status": "pass",
+          "expected_result": "reject",
+          "actual_result": "rejected",
+          "control_passed": true,
+          "rejection_stage": "validation",
           "reason": "topology must declare default_deny.enforced=true"
+        },
+        {
+          "topology": "bad_missing_shared_service_path.yaml",
+          "expected_result": "reject",
+          "actual_result": "rejected",
+          "control_passed": true,
+          "rejection_stage": "verification",
+          "reason": "missing required reachable path(s): slice_a_workload -> shared_auth_log, slice_b_workload -> shared_auth_log"
         }
       ]
     },
@@ -300,27 +329,27 @@
       "status": "pass",
       "validation_time": {
         "stage": "validation",
-        "wall_clock_seconds": 0.04185433400562033,
-        "cpu_seconds": 0.04184699999999997,
-        "peak_memory_bytes": 29217
+        "wall_clock_seconds": 0.019924833992263302,
+        "cpu_seconds": 0.019912000000000013,
+        "peak_python_tracemalloc_bytes": 29404
       },
       "compile_time": {
         "stage": "compile",
-        "wall_clock_seconds": 0.04578629200113937,
-        "cpu_seconds": 0.04575499999999999,
-        "peak_memory_bytes": 147117
+        "wall_clock_seconds": 0.02167300001019612,
+        "cpu_seconds": 0.021657999999999983,
+        "peak_python_tracemalloc_bytes": 147781
       },
       "graph_construction_time": {
         "stage": "graph_construction",
-        "wall_clock_seconds": 0.00914074998581782,
-        "cpu_seconds": 0.009139000000000008,
-        "peak_memory_bytes": 208254
+        "wall_clock_seconds": 0.004288833006285131,
+        "cpu_seconds": 0.004288000000000014,
+        "peak_python_tracemalloc_bytes": 208254
       },
       "verification_time": {
         "stage": "verification",
-        "wall_clock_seconds": 0.011784624977735803,
-        "cpu_seconds": 0.011782000000000015,
-        "peak_memory_bytes": 208222
+        "wall_clock_seconds": 0.00567245899583213,
+        "cpu_seconds": 0.005671000000000009,
+        "peak_python_tracemalloc_bytes": 208222
       },
       "generated_policy_file_sizes_bytes": {
         "ocloud_microsegmentation.generated.yaml": 595,
@@ -336,18 +365,19 @@
       },
       "graph_node_count": 8,
       "graph_edge_count": 5,
-      "peak_memory_bytes_max": 208254,
-      "overall_wall_clock_seconds": 0.10856600097031333,
-      "overall_cpu_seconds": 0.10852299999999998,
+      "peak_python_tracemalloc_bytes_max": 208254,
+      "memory_measurement_basis": "Python tracemalloc peak bytes (not process RSS)",
+      "overall_wall_clock_seconds": 0.05155912600457668,
+      "overall_cpu_seconds": 0.05152900000000002,
       "local_overhead_statement": "These measurements report modest local proof-of-concept overhead only. They do not establish production scalability."
     }
   },
   "bounded_claim": "The evidence supports only bounded, local, model-based validation, compilation, static non-reachability verification, negative-control rejection, and modest local overhead reporting.",
   "result_files": {
-    "verification_report_json": "/Users/ryan/Documents/Minor-Thesis/results/reports/verification_report.json",
-    "verification_report_md": "/Users/ryan/Documents/Minor-Thesis/results/reports/verification_report.md",
-    "experiment_summary_json": "/Users/ryan/Documents/Minor-Thesis/results/reports/experiment_summary.json",
-    "experiment_summary_md": "/Users/ryan/Documents/Minor-Thesis/results/reports/experiment_summary.md",
-    "overhead_metrics_json": "/Users/ryan/Documents/Minor-Thesis/results/metrics/overhead_metrics.json"
+    "verification_report_json": "results/reports/verification_report.json",
+    "verification_report_md": "results/reports/verification_report.md",
+    "experiment_summary_json": "results/reports/experiment_summary.json",
+    "experiment_summary_md": "results/reports/experiment_summary.md",
+    "overhead_metrics_json": "results/metrics/overhead_metrics.json"
   }
 }

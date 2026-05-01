@@ -71,6 +71,28 @@ Experiment evidence:
 - `results/reports/experiment_summary.json` reports all experiments E1-E5 as passing.
 - `policies/generated/` contains exactly three `*.generated.*` policy artefacts.
 
+## Reference Environment Capture
+
+The committed evidence under `results/` was regenerated on May 1, 2026 in a local macOS environment after activating `.venv`.
+
+Commands recorded for reproducibility:
+
+```bash
+python --version
+pip freeze
+uname -a
+make run-all
+pytest
+```
+
+Observed reference outputs:
+
+- `python --version`: `Python 3.14.3`
+- `uname -a`: `Darwin ryans-MacBook-Pro.local 25.4.0 Darwin Kernel Version 25.4.0: Thu Mar 19 19:33:43 PDT 2026; root:xnu-12377.101.15~1/RELEASE_ARM64_T8142 arm64`
+- `pip freeze`: recorded in `docs/reference_pip_freeze.txt`, with the editable local path normalized to `-e .` for portability
+- `make run-all`: completed successfully, including validation, compilation, verification, `pytest`, and `python experiments/run_all_experiments.py`
+- `pytest`: `48 passed`
+
 ## Interpretation Boundary
 
 Successful reproduction shows only that the bounded local proof of concept behaves as designed in the repository's static model. It does not demonstrate runtime enforcement, live O-RAN security, production deployment readiness, or complete operational assurance.
