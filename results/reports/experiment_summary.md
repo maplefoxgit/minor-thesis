@@ -10,7 +10,8 @@
 ### E1 Schema expressiveness
 - Status: `pass`
 - Schema coverage: 1.00
-- Ambiguity count: 1
+- Accepted-intent ambiguity count: 0
+- Ambiguous invalid case rejection count: 1
 - Unsupported case count: 0
 - valid_intent: `pass`; valid intent accepted
 - third_slice: `pass`; exactly two slices named slice_a and slice_b are required
@@ -43,26 +44,29 @@
 
 ### E4 Negative-control misconfiguration
 - Status: `pass`
-- bad_direct_cross_slice.yaml: `pass`; direct cross-slice workload edge is not allowed
-- bad_transport_cross_slice.yaml: `pass`; node 'slice_a_workload' must set transport_segment='tn_segment_slice_a'
-- bad_shared_service_transit.yaml: `pass`; shared_auth_log must declare transit_allowed=false
-- bad_missing_default_deny.yaml: `pass`; topology must declare default_deny.enforced=true
+- bad_direct_cross_slice.yaml: expected=`reject`, actual=`rejected`, control_passed=`True`; direct cross-slice workload edge is not allowed
+- bad_transport_misbinding.yaml: expected=`reject`, actual=`rejected`, control_passed=`True`; node 'slice_a_workload' must set transport_segment='tn_segment_slice_a'
+- bad_transport_cross_slice_edge.yaml: expected=`reject`, actual=`rejected`, control_passed=`True`; transport edge tn_segment_slice_a -> tn_segment_slice_b is not permitted by the compiled transport policy
+- bad_shared_service_transit.yaml: expected=`reject`, actual=`rejected`, control_passed=`True`; shared_auth_log must declare transit_allowed=false
+- bad_missing_default_deny.yaml: expected=`reject`, actual=`rejected`, control_passed=`True`; topology must declare default_deny.enforced=true
+- bad_missing_shared_service_path.yaml: expected=`reject`, actual=`rejected`, control_passed=`True`; missing required reachable path(s): slice_a_workload -> shared_auth_log, slice_b_workload -> shared_auth_log
 
 ### E5 Practical overhead
 - Status: `pass`
 - Graph size: nodes=8, edges=5
 - Generated rule count: 10
-- Peak memory (max stage): 208254 bytes
-- Overall wall-clock time: 0.108566 seconds
-- Overall CPU time: 0.108523 seconds
+- Peak Python tracemalloc bytes (max stage): 208254 bytes
+- Overall wall-clock time: 0.051559 seconds
+- Overall CPU time: 0.051529 seconds
+- Memory measurement basis: Python tracemalloc peak bytes (not process RSS)
 - Local overhead note: These measurements report modest local proof-of-concept overhead only. They do not establish production scalability.
 
 ## Result Files
-- Verification report JSON: `/Users/ryan/Documents/Minor-Thesis/results/reports/verification_report.json`
-- Verification report Markdown: `/Users/ryan/Documents/Minor-Thesis/results/reports/verification_report.md`
-- Experiment summary JSON: `/Users/ryan/Documents/Minor-Thesis/results/reports/experiment_summary.json`
-- Experiment summary Markdown: `/Users/ryan/Documents/Minor-Thesis/results/reports/experiment_summary.md`
-- Overhead metrics JSON: `/Users/ryan/Documents/Minor-Thesis/results/metrics/overhead_metrics.json`
+- Verification report JSON: `results/reports/verification_report.json`
+- Verification report Markdown: `results/reports/verification_report.md`
+- Experiment summary JSON: `results/reports/experiment_summary.json`
+- Experiment summary Markdown: `results/reports/experiment_summary.md`
+- Overhead metrics JSON: `results/metrics/overhead_metrics.json`
 
 ## Limitations
 This evidence proves only bounded, model-based static behavior in the local proof-of-concept representation. It does not establish runtime security, packet delivery outcomes, live O-RAN control behavior, or production scalability.

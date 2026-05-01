@@ -2,7 +2,13 @@ from __future__ import annotations
 
 from typing import Any
 
-from _common import POLICIES_DIR, compile_baseline_to_repository, print_json, verify_baseline_to_repository
+from _common import (
+    POLICIES_DIR,
+    compile_baseline_to_repository,
+    print_json,
+    rel,
+    verify_baseline_to_repository,
+)
 
 
 def run() -> dict[str, Any]:
@@ -38,7 +44,7 @@ def run() -> dict[str, Any]:
         "experiment_id": "E3",
         "title": "Reachability verification",
         "status": overall_status,
-        "policies_directory": str(POLICIES_DIR),
+        "policies_directory": rel(POLICIES_DIR),
         "required_reachable_pass_count": sum(
             result["status"] == "pass" for result in report["required_reachable"]
         ),

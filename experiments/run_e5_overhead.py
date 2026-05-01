@@ -69,11 +69,11 @@ def run() -> dict[str, Any]:
         file_sizes = collect_file_sizes(policies_dir)
         rule_counts = count_generated_rules(policies_dir)
 
-    peak_memory_bytes_max = max(
-        validation_metrics["peak_memory_bytes"],
-        compile_metrics["peak_memory_bytes"],
-        graph_metrics["peak_memory_bytes"],
-        verification_metrics["peak_memory_bytes"],
+    peak_python_tracemalloc_bytes_max = max(
+        validation_metrics["peak_python_tracemalloc_bytes"],
+        compile_metrics["peak_python_tracemalloc_bytes"],
+        graph_metrics["peak_python_tracemalloc_bytes"],
+        verification_metrics["peak_python_tracemalloc_bytes"],
     )
     overall_wall_clock_seconds = (
         validation_metrics["wall_clock_seconds"]
@@ -108,7 +108,8 @@ def run() -> dict[str, Any]:
         "generated_rule_breakdown": rule_counts,
         "graph_node_count": verification_report["graph_node_count"],
         "graph_edge_count": verification_report["graph_edge_count"],
-        "peak_memory_bytes_max": peak_memory_bytes_max,
+        "peak_python_tracemalloc_bytes_max": peak_python_tracemalloc_bytes_max,
+        "memory_measurement_basis": "Python tracemalloc peak bytes (not process RSS)",
         "overall_wall_clock_seconds": overall_wall_clock_seconds,
         "overall_cpu_seconds": overall_cpu_seconds,
         "local_overhead_statement": (

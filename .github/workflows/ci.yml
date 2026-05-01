@@ -1,13 +1,12 @@
-name: ci
+name: CI
 
 on:
   push:
   pull_request:
 
 jobs:
-  bounded-proof-of-concept:
+  test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -20,16 +19,11 @@ jobs:
       - name: Install dependencies
         run: make install
 
-      - name: Run bounded workflow and experiments
+      - name: Run bounded pipeline
+        run: make run-all
+
+      - name: Check repository hygiene
         shell: bash
         run: |
-          source .venv/bin/activate
-          make validate
-          make compile
-          generated_count=$(find policies/generated -maxdepth 1 -type f -name '*.generated.*' | wc -l | tr -d ' ')
-          test "$generated_count" -eq 3
-          make verify
-          make test
-          python experiments/run_all_experiments.py
-          generated_count=$(find policies/generated -maxdepth 1 -type f -name '*.generated.*' | wc -l | tr -d ' ')
-          test "$generated_count" -eq 3
+          ! git ls-files | grep -E '(^\.venv/|__pycache__|\.pyc$|\.pytest_cache|\.egg-info)'
+          ! grep -R "/Users/" README.md docs results policies

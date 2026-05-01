@@ -1,10 +1,10 @@
-topology_id: bad-transport-cross-slice
+topology_id: bad-transport-cross-slice-edge
 nodes:
   - node_id: slice_a_workload
     layer: workload
     slice_id: slice_a
     namespace: ns-slice-a
-    transport_segment: tn_segment_slice_b
+    transport_segment: tn_segment_slice_a
   - node_id: slice_b_workload
     layer: workload
     slice_id: slice_b
@@ -40,11 +40,14 @@ edges:
     destination: slice_b_workload
     relation: governs
   - source: slice_a_workload
-    destination: tn_segment_slice_b
+    destination: tn_segment_slice_a
     relation: attached_to
   - source: slice_b_workload
     destination: tn_segment_slice_b
     relation: attached_to
+  - source: tn_segment_slice_a
+    destination: tn_segment_slice_b
+    relation: routed_via
   - source: tn_segment_slice_a
     destination: tn_segment_shared
     relation: routed_via

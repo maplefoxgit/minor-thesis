@@ -2,13 +2,13 @@
 
 This repository is intentionally bounded. It does **not** provide or claim:
 
-- no production O-RAN deployment,
-- no live RIC, xApp, or rApp integration,
-- no Kubernetes dependency,
-- no runtime drift claim,
-- no cryptographic enforcement claim,
-- no packet-delivery claim,
-- no complete O-RAN security claim.
+- production O-RAN deployment,
+- live RIC, xApp, or rApp integration,
+- Kubernetes dependency,
+- runtime drift detection,
+- cryptographic enforcement,
+- packet-delivery assurance,
+- complete O-RAN security assurance.
 
 Additional boundaries:
 
