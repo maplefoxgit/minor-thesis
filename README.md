@@ -7,7 +7,7 @@ The scope of this phase is intentionally narrow:
 - Local Python implementation only.
 - Exactly two slices: `slice_a` and `slice_b`.
 - Exactly one shared service: `shared_auth_log`.
-- Static validation and topology loading only.
+- Deterministic compilation of exactly three representational policy artefacts.
 - Static graph-based reachability verification is the target proof technique for later phases.
 
 The following are deliberately out of scope in this repository phase:
@@ -15,7 +15,7 @@ The following are deliberately out of scope in this repository phase:
 - Kubernetes, Docker, ORANSlice, OAI, Open5GS, live RIC, xApps, rApps, or radio-stack integration.
 - Runtime packet testing, runtime auditing, or live O-RAN control-plane enforcement.
 - External network dependencies or remote services.
-- Policy compilation or generated policy artefacts at this stage.
+- Any claim of a production O-RAN control path.
 
 `shared_auth_log` is modeled as a terminal shared authentication-and-logging service and must always declare `transit_allowed: false`.
 
@@ -49,18 +49,30 @@ The following are deliberately out of scope in this repository phase:
 │       ├── __init__.py
 │       ├── __main__.py
 │       ├── cli.py
+│       ├── compiler.py
+│       ├── policy_models.py
 │       ├── validation.py
 │       ├── models.py
 │       └── io.py
 ├── tests/
 │   ├── test_schema_validation.py
 │   ├── test_semantic_validation.py
-│   └── test_topology_load.py
+│   ├── test_topology_load.py
+│   ├── test_compiler_outputs.py
+│   ├── test_compiler_determinism.py
+│   └── test_compiler_conflicts.py
 └── docs/
     └── methodology_traceability.md
 ```
 
-`policies/generated/` is reserved for later thesis phases and is intentionally empty in this validation-only baseline.
+The compiler writes exactly these files to `policies/generated/`:
+
+- `transport_policy.generated.json`
+- `ocloud_microsegmentation.generated.yaml`
+- `oran_slice_policy.generated.json`
+- `manifest.json`
+
+No fourth policy artefact is produced. The manifest is allowed because it is not itself a policy artefact.
 
 ## Setup
 
@@ -97,9 +109,44 @@ make test
 make validate
 ```
 
-## Thesis Mapping to RQ1
+## Compilation
 
-This phase maps to **RQ1** by formalizing the bounded two-slice intent model, validating its schema, enforcing thesis-specific semantic rules, and loading the static topology used by later graph-based verification.
+Compile the validated intent and topology into the deterministic RQ2 outputs:
+
+```bash
+python -m oran_slice_security compile --schema schemas/slice_security_intent.schema.json --intent intents/two_slice_shared_auth_log.valid.yaml --topology topology/base_topology.yaml --out policies/generated
+```
+
+Or use the repository helpers:
+
+```bash
+make compile
+make clean-generated
+```
+
+The compiler always validates structure, semantics, and topology before writing outputs.
+
+## Why These Artefacts Are Representational
+
+The generated artefacts are intentionally representational and graph-consumable rather than executable production policies. They encode bounded transport segmentation, O-Cloud micro-segmentation, and slice-scoped O-RAN metadata in a deterministic form that later RQ3 graph analysis can consume.
+
+What they are for:
+
+- Static graph construction.
+- Reachability and isolation reasoning in the bounded proof of concept.
+- Traceable, deterministic inputs for later verification logic.
+
+What they do not claim:
+
+- No live RIC, xApp, or rApp control path.
+- No production O-RAN enforcement.
+- No runtime auditing or packet-level behavior.
+
+## Thesis Mapping
+
+### RQ1
+
+RQ1 is covered by formalizing the bounded two-slice intent model, validating its schema, enforcing thesis-specific semantic rules, and loading the static topology used by later graph-based verification.
 
 What RQ1 covers here:
 
@@ -107,9 +154,10 @@ What RQ1 covers here:
 - Semantic rejection of invalid slice-security cases.
 - Static topology loading for the proof-of-concept network graph.
 
-What is not implemented yet:
+### RQ2
 
-- RQ2 policy compilation into generated artefacts.
-- RQ3 reachability verification over compiled policy and topology graphs.
+RQ2 is covered by the deterministic compiler in `src/oran_slice_security/compiler.py`, which emits exactly three generated policy artefacts plus a hash manifest.
 
-No generated policy artefacts are created in this phase.
+### RQ3
+
+RQ3 is still planned as static graph-based reachability verification over the compiled policy and topology representations.

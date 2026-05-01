@@ -1,0 +1,36 @@
+{
+  "policy_type": "transport_segmentation",
+  "default_action": "deny",
+  "transport_segments": [
+    "tn_segment_slice_a",
+    "tn_segment_slice_b",
+    "tn_segment_shared"
+  ],
+  "allowed_directed_adjacencies": [
+    {
+      "source": "tn_segment_slice_a",
+      "destination": "tn_segment_shared"
+    },
+    {
+      "source": "tn_segment_slice_b",
+      "destination": "tn_segment_shared"
+    }
+  ],
+  "forbidden_directed_adjacencies": [
+    {
+      "source": "tn_segment_slice_a",
+      "destination": "tn_segment_slice_b",
+      "reason": "inter_slice_isolation"
+    },
+    {
+      "source": "tn_segment_slice_b",
+      "destination": "tn_segment_slice_a",
+      "reason": "inter_slice_isolation"
+    }
+  ],
+  "provenance": {
+    "intent_identity_field": "thesis_id",
+    "intent_identity_value": "RQ1-bounded-two-slice-intent",
+    "validation_state": "validated"
+  }
+}
