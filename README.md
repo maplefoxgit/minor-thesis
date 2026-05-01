@@ -8,7 +8,7 @@ The scope of this phase is intentionally narrow:
 - Exactly two slices: `slice_a` and `slice_b`.
 - Exactly one shared service: `shared_auth_log`.
 - Deterministic compilation of exactly three representational policy artefacts.
-- Static graph-based reachability verification is the target proof technique for later phases.
+- Static graph-based reachability verification over the compiled local model.
 
 The following are deliberately out of scope in this repository phase:
 
@@ -50,17 +50,32 @@ The following are deliberately out of scope in this repository phase:
 │       ├── __main__.py
 │       ├── cli.py
 │       ├── compiler.py
+│       ├── graph_builder.py
 │       ├── policy_models.py
+│       ├── report.py
+│       ├── verifier.py
 │       ├── validation.py
 │       ├── models.py
 │       └── io.py
+├── verifier/
+│   └── queries/
+│       └── baseline_queries.yaml
+├── results/
+│   ├── reports/
+│   │   └── .gitkeep
+│   └── metrics/
+│       └── .gitkeep
 ├── tests/
 │   ├── test_schema_validation.py
 │   ├── test_semantic_validation.py
 │   ├── test_topology_load.py
 │   ├── test_compiler_outputs.py
 │   ├── test_compiler_determinism.py
-│   └── test_compiler_conflicts.py
+│   ├── test_compiler_conflicts.py
+│   ├── test_graph_builder.py
+│   ├── test_reachability_verifier.py
+│   ├── test_negative_controls.py
+│   └── test_report_generation.py
 └── docs/
     └── methodology_traceability.md
 ```
@@ -142,6 +157,52 @@ What they do not claim:
 - No production O-RAN enforcement.
 - No runtime auditing or packet-level behavior.
 
+## Verification
+
+Verify static reachability over the compiled policy-and-topology model:
+
+```bash
+python -m oran_slice_security verify --topology topology/base_topology.yaml --policies policies/generated --queries verifier/queries/baseline_queries.yaml --out results/reports
+```
+
+Or run the complete bounded workflow:
+
+```bash
+python -m oran_slice_security run-all
+```
+
+The verifier emits:
+
+- `results/reports/verification_report.json`
+- `results/reports/verification_report.md`
+
+## Recommended Run Order
+
+```bash
+make validate
+make compile
+make verify
+make test
+```
+
+For convenience:
+
+```bash
+make run-all
+```
+
+## Bounded Static Assurance Claim
+
+This repository proves only model-based static non-reachability in the local policy-and-topology model. In the bounded baseline, it shows that:
+
+- `slice_a_workload` can reach `shared_auth_log` only through the permitted slice and shared transport path.
+- `slice_b_workload` can reach `shared_auth_log` only through the permitted slice and shared transport path.
+- Cross-slice workload reachability is blocked in the model.
+- Cross-slice transport-segment reachability is blocked in the model.
+- `shared_auth_log` is terminal and cannot act as transit in the model.
+
+This is not a claim about runtime enforcement, live O-RAN behavior, or production assurance.
+
 ## Thesis Mapping
 
 ### RQ1
@@ -160,4 +221,4 @@ RQ2 is covered by the deterministic compiler in `src/oran_slice_security/compile
 
 ### RQ3
 
-RQ3 is still planned as static graph-based reachability verification over the compiled policy and topology representations.
+RQ3 is covered by the static verifier, deterministic breadth-first reachability analysis, baseline query set, and thesis-readable JSON/Markdown reports over the compiled policy-and-topology model.

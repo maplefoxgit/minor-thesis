@@ -1,0 +1,16 @@
+required_reachable:
+  - source: slice_a_workload
+    destination: shared_auth_log
+  - source: slice_b_workload
+    destination: shared_auth_log
+forbidden_unreachable:
+  - source: slice_a_workload
+    destination: slice_b_workload
+  - source: slice_b_workload
+    destination: slice_a_workload
+  - source: tn_segment_slice_a
+    destination: tn_segment_slice_b
+  - source: tn_segment_slice_b
+    destination: tn_segment_slice_a
+terminal_services:
+  - shared_auth_log
