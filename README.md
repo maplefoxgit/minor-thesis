@@ -1,23 +1,67 @@
 # Transport-Aware Slice-Security Intent Compilation and Reachability Verification
 
+## Project Purpose
+
 This repository is the practical GitHub implementation for a bounded design-science proof of concept within the Master's minor thesis, *Transport-Aware Slice-Security Intent Compilation and Reachability Verification*.
 
-The scope of this phase is intentionally narrow:
+It implements a fixed local pipeline that:
 
-- Local Python implementation only.
-- Exactly two slices: `slice_a` and `slice_b`.
-- Exactly one shared service: `shared_auth_log`.
-- Deterministic compilation of exactly three representational policy artefacts.
-- Static graph-based reachability verification is the target proof technique for later phases.
+1. validates a bounded two-slice slice-security intent,
+2. deterministically compiles exactly three representational policy artefacts,
+3. verifies static reachability and non-reachability over the compiled local model,
+4. runs the E1-E5 evaluation automation and writes thesis evidence under `results/`.
 
-The following are deliberately out of scope in this repository phase:
+## Thesis Claim
 
-- Kubernetes, Docker, ORANSlice, OAI, Open5GS, live RIC, xApps, rApps, or radio-stack integration.
-- Runtime packet testing, runtime auditing, or live O-RAN control-plane enforcement.
-- External network dependencies or remote services.
-- Any claim of a production O-RAN control path.
+The thesis claim supported by this repository is intentionally narrow:
+
+- exactly two slices: `slice_a` and `slice_b`,
+- exactly one shared service: `shared_auth_log`,
+- deterministic representational policy compilation,
+- deterministic static graph-based reachability verification,
+- negative-control rejection for bounded misconfiguration cases,
+- modest local overhead reporting.
+
+This proves only model-based static non-reachability in the local policy-and-topology model.
+
+## Out Of Scope
+
+The repository does **not** claim:
+
+- production O-RAN deployment,
+- live RIC, xApp, or rApp control,
+- Kubernetes, Docker, ORANSlice, OAI, Open5GS, or radio-stack integration,
+- runtime drift detection,
+- runtime packet auditing or delivery assurance,
+- cryptographic enforcement,
+- complete O-RAN security assurance.
 
 `shared_auth_log` is modeled as a terminal shared authentication-and-logging service and must always declare `transit_allowed: false`.
+
+## Quickstart
+
+Create the virtual environment and install dependencies:
+
+```bash
+make install
+source .venv/bin/activate
+```
+
+Run the bounded workflow in the required order:
+
+```bash
+make validate
+make compile
+make verify
+make test
+```
+
+Run the full evidence automation:
+
+```bash
+make run-all
+python experiments/run_all_experiments.py
+```
 
 ## Repository Structure
 
@@ -27,137 +71,137 @@ The following are deliberately out of scope in this repository phase:
 ├── pyproject.toml
 ├── Makefile
 ├── schemas/
-│   └── slice_security_intent.schema.json
 ├── intents/
-│   ├── two_slice_shared_auth_log.valid.yaml
-│   └── invalid/
-│       ├── third_slice.invalid.yaml
-│       ├── missing_shared_service.invalid.yaml
-│       ├── ambiguous_direction.invalid.yaml
-│       ├── conflicting_allow_deny.invalid.yaml
-│       ├── shared_service_transit.invalid.yaml
-│       └── duplicate_endpoint.invalid.yaml
 ├── topology/
-│   ├── base_topology.yaml
-│   └── negative_controls/
-│       ├── bad_direct_cross_slice.yaml
-│       ├── bad_transport_cross_slice.yaml
-│       ├── bad_shared_service_transit.yaml
-│       └── bad_missing_default_deny.yaml
-├── src/
-│   └── oran_slice_security/
-│       ├── __init__.py
-│       ├── __main__.py
-│       ├── cli.py
-│       ├── compiler.py
-│       ├── policy_models.py
-│       ├── validation.py
-│       ├── models.py
-│       └── io.py
+├── policies/generated/
+├── verifier/queries/
+├── experiments/
+├── results/
+│   ├── reports/
+│   └── metrics/
+├── src/oran_slice_security/
 ├── tests/
-│   ├── test_schema_validation.py
-│   ├── test_semantic_validation.py
-│   ├── test_topology_load.py
-│   ├── test_compiler_outputs.py
-│   ├── test_compiler_determinism.py
-│   └── test_compiler_conflicts.py
-└── docs/
-    └── methodology_traceability.md
+├── docs/
+└── .github/workflows/
 ```
 
-The compiler writes exactly these files to `policies/generated/`:
+Important implementation areas:
 
-- `transport_policy.generated.json`
-- `ocloud_microsegmentation.generated.yaml`
-- `oran_slice_policy.generated.json`
-- `manifest.json`
+- `src/oran_slice_security/validation.py`: RQ1 validation rules.
+- `src/oran_slice_security/compiler.py`: RQ2 deterministic compiler.
+- `src/oran_slice_security/graph_builder.py`: compiled policy-and-topology graph construction.
+- `src/oran_slice_security/verifier.py`: RQ3 deterministic breadth-first search verification.
+- `experiments/`: E1-E5 automation.
+- `results/`: generated thesis evidence.
 
-No fourth policy artefact is produced. The manifest is allowed because it is not itself a policy artefact.
+## Commands
 
-## Setup
-
-Create the local virtual environment and install the package plus test dependencies:
-
-```bash
-make install
-```
-
-If you want to use the exact CLI form shown below, activate the environment first:
-
-```bash
-source .venv/bin/activate
-```
-
-## Validation Commands
-
-Validate the bounded slice-security intent:
+Validate intent and topology:
 
 ```bash
 python -m oran_slice_security validate-intent --schema schemas/slice_security_intent.schema.json --intent intents/two_slice_shared_auth_log.valid.yaml
-```
-
-Validate the static base topology:
-
-```bash
 python -m oran_slice_security validate-topology --topology topology/base_topology.yaml
-```
-
-Or run the repository helpers:
-
-```bash
-make test
 make validate
 ```
 
-## Compilation
-
-Compile the validated intent and topology into the deterministic RQ2 outputs:
+Compile the three required policy artefacts:
 
 ```bash
 python -m oran_slice_security compile --schema schemas/slice_security_intent.schema.json --intent intents/two_slice_shared_auth_log.valid.yaml --topology topology/base_topology.yaml --out policies/generated
+make compile
 ```
 
-Or use the repository helpers:
+Verify static reachability:
 
 ```bash
-make compile
-make clean-generated
+python -m oran_slice_security verify --topology topology/base_topology.yaml --policies policies/generated --queries verifier/queries/baseline_queries.yaml --out results/reports
+make verify
 ```
 
-The compiler always validates structure, semantics, and topology before writing outputs.
+Run all bounded repository steps:
 
-## Why These Artefacts Are Representational
+```bash
+python -m oran_slice_security run-all
+make run-all
+```
 
-The generated artefacts are intentionally representational and graph-consumable rather than executable production policies. They encode bounded transport segmentation, O-Cloud micro-segmentation, and slice-scoped O-RAN metadata in a deterministic form that later RQ3 graph analysis can consume.
+Run the evaluation automation:
 
-What they are for:
+```bash
+python experiments/run_e1_schema_expressiveness.py
+python experiments/run_e2_compiler_coherence.py
+python experiments/run_e3_reachability_verification.py
+python experiments/run_e4_negative_controls.py
+python experiments/run_e5_overhead.py
+python experiments/run_all_experiments.py
+```
 
-- Static graph construction.
-- Reachability and isolation reasoning in the bounded proof of concept.
-- Traceable, deterministic inputs for later verification logic.
+## Expected Outputs
 
-What they do not claim:
+The compiler must create exactly three policy artefacts and one allowed manifest:
 
-- No live RIC, xApp, or rApp control path.
-- No production O-RAN enforcement.
-- No runtime auditing or packet-level behavior.
+- `policies/generated/transport_policy.generated.json`
+- `policies/generated/ocloud_microsegmentation.generated.yaml`
+- `policies/generated/oran_slice_policy.generated.json`
+- `policies/generated/manifest.json`
 
-## Thesis Mapping
+No fourth policy artefact is allowed.
 
-### RQ1
+The verifier writes:
 
-RQ1 is covered by formalizing the bounded two-slice intent model, validating its schema, enforcing thesis-specific semantic rules, and loading the static topology used by later graph-based verification.
+- `results/reports/verification_report.json`
+- `results/reports/verification_report.md`
 
-What RQ1 covers here:
+The experiment automation writes:
 
-- Schema-based validation for the intent document.
-- Semantic rejection of invalid slice-security cases.
-- Static topology loading for the proof-of-concept network graph.
+- `results/reports/experiment_summary.json`
+- `results/reports/experiment_summary.md`
+- `results/metrics/overhead_metrics.json`
 
-### RQ2
+## Why The Policy Artefacts Are Representational
 
-RQ2 is covered by the deterministic compiler in `src/oran_slice_security/compiler.py`, which emits exactly three generated policy artefacts plus a hash manifest.
+The generated policy artefacts are representational and graph-consumable rather than executable production policies. They exist to encode bounded transport segmentation, O-Cloud micro-segmentation, and minimal slice-scoped O-RAN metadata for later static analysis.
 
-### RQ3
+They do **not** claim:
 
-RQ3 is still planned as static graph-based reachability verification over the compiled policy and topology representations.
+- a production O-RAN control path,
+- live RIC or xApp or rApp enforcement,
+- runtime enforcement or packet-level behavior.
+
+## Experiment Descriptions
+
+- `E1 Schema expressiveness`: confirms the valid intent passes and the bounded invalid intents fail for the expected reasons.
+- `E2 Compiler coherence`: confirms exactly three policy artefacts, identifier consistency, and deterministic regeneration.
+- `E3 Reachability verification`: confirms both permitted paths to `shared_auth_log` survive while forbidden cross-slice paths do not.
+- `E4 Negative-control misconfiguration`: confirms each negative-control topology fails with a useful reason.
+- `E5 Practical overhead`: reports local timing, CPU, memory, file size, rule count, and graph-size evidence without making a production scalability claim.
+
+## How To Reproduce Reports
+
+From a clean checkout:
+
+```bash
+make install
+source .venv/bin/activate
+make run-all
+python experiments/run_all_experiments.py
+```
+
+Then inspect:
+
+- `results/reports/verification_report.json`
+- `results/reports/verification_report.md`
+- `results/reports/experiment_summary.json`
+- `results/reports/experiment_summary.md`
+- `results/metrics/overhead_metrics.json`
+
+## How To Interpret Pass And Fail
+
+- `pass` means the bounded local model behaved exactly as the fixed methodology requires.
+- `fail` means the repository detected a structural, semantic, compilation, reachability, or negative-control violation relative to the fixed bounded design.
+- A passing verification report means only the modeled graph satisfied the required reachability and non-reachability properties.
+- A passing experiment summary means E1-E5 all completed successfully within the bounded local proof of concept.
+
+## Bounded Limitations
+
+This repository proves only model-based static non-reachability in the local policy-and-topology model. It does not establish runtime enforcement, runtime drift resistance, packet delivery guarantees, cryptographic protection, live O-RAN behavior, or complete end-to-end O-RAN security.

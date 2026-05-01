@@ -1,0 +1,175 @@
+{
+  "overall_status": "pass",
+  "required_reachable": [
+    {
+      "source": "slice_a_workload",
+      "destination": "shared_auth_log",
+      "status": "pass",
+      "path": [
+        "slice_a_workload",
+        "tn_segment_slice_a",
+        "tn_segment_shared",
+        "shared_auth_log"
+      ],
+      "edge_provenance": [
+        {
+          "source": "slice_a_workload",
+          "destination": "tn_segment_slice_a",
+          "provenance": [
+            "topology",
+            "ocloud_microsegmentation",
+            "oran_slice_policy"
+          ]
+        },
+        {
+          "source": "tn_segment_slice_a",
+          "destination": "tn_segment_shared",
+          "provenance": [
+            "topology",
+            "transport_policy",
+            "oran_slice_policy"
+          ]
+        },
+        {
+          "source": "tn_segment_shared",
+          "destination": "shared_auth_log",
+          "provenance": [
+            "topology",
+            "ocloud_microsegmentation",
+            "oran_slice_policy"
+          ]
+        }
+      ]
+    },
+    {
+      "source": "slice_b_workload",
+      "destination": "shared_auth_log",
+      "status": "pass",
+      "path": [
+        "slice_b_workload",
+        "tn_segment_slice_b",
+        "tn_segment_shared",
+        "shared_auth_log"
+      ],
+      "edge_provenance": [
+        {
+          "source": "slice_b_workload",
+          "destination": "tn_segment_slice_b",
+          "provenance": [
+            "topology",
+            "ocloud_microsegmentation",
+            "oran_slice_policy"
+          ]
+        },
+        {
+          "source": "tn_segment_slice_b",
+          "destination": "tn_segment_shared",
+          "provenance": [
+            "topology",
+            "transport_policy",
+            "oran_slice_policy"
+          ]
+        },
+        {
+          "source": "tn_segment_shared",
+          "destination": "shared_auth_log",
+          "provenance": [
+            "topology",
+            "ocloud_microsegmentation",
+            "oran_slice_policy"
+          ]
+        }
+      ]
+    }
+  ],
+  "forbidden_unreachable": [
+    {
+      "source": "slice_a_workload",
+      "destination": "slice_b_workload",
+      "status": "pass",
+      "violation_path": null,
+      "edge_provenance": []
+    },
+    {
+      "source": "slice_b_workload",
+      "destination": "slice_a_workload",
+      "status": "pass",
+      "violation_path": null,
+      "edge_provenance": []
+    },
+    {
+      "source": "tn_segment_slice_a",
+      "destination": "tn_segment_slice_b",
+      "status": "pass",
+      "violation_path": null,
+      "edge_provenance": []
+    },
+    {
+      "source": "tn_segment_slice_b",
+      "destination": "tn_segment_slice_a",
+      "status": "pass",
+      "violation_path": null,
+      "edge_provenance": []
+    }
+  ],
+  "terminal_service_transit": [
+    {
+      "service": "shared_auth_log",
+      "status": "pass",
+      "outgoing_edges": [],
+      "violation_paths": []
+    }
+  ],
+  "paths_found_for_reachable_paths": [
+    {
+      "source": "slice_a_workload",
+      "destination": "shared_auth_log",
+      "path": [
+        "slice_a_workload",
+        "tn_segment_slice_a",
+        "tn_segment_shared",
+        "shared_auth_log"
+      ]
+    },
+    {
+      "source": "slice_b_workload",
+      "destination": "shared_auth_log",
+      "path": [
+        "slice_b_workload",
+        "tn_segment_slice_b",
+        "tn_segment_shared",
+        "shared_auth_log"
+      ]
+    }
+  ],
+  "paths_found_for_violations": [],
+  "edge_provenance": {
+    "slice_a_workload->tn_segment_slice_a": [
+      "topology",
+      "ocloud_microsegmentation",
+      "oran_slice_policy"
+    ],
+    "slice_b_workload->tn_segment_slice_b": [
+      "topology",
+      "ocloud_microsegmentation",
+      "oran_slice_policy"
+    ],
+    "tn_segment_shared->shared_auth_log": [
+      "topology",
+      "ocloud_microsegmentation",
+      "oran_slice_policy"
+    ],
+    "tn_segment_slice_a->tn_segment_shared": [
+      "topology",
+      "transport_policy",
+      "oran_slice_policy"
+    ],
+    "tn_segment_slice_b->tn_segment_shared": [
+      "topology",
+      "transport_policy",
+      "oran_slice_policy"
+    ]
+  },
+  "graph_node_count": 8,
+  "graph_edge_count": 5
+}
