@@ -1,4 +1,4 @@
-# RQ-to-Repo Mapping and Related-Work Alignment
+# RQ-to-Repo Mapping and Related-Work Methodology Alignment
 
 This document explains how the GitHub repository maps to the thesis research questions, methodology, and related-work patterns.
 
@@ -6,13 +6,19 @@ The repository is not a separate coding exercise. It is the practical proof-of-c
 
 ## Main research question
 
-The main question behind this repository is:
+For supervisor discussion, the three research questions can be summarised by the following umbrella question:
 
 > How can a compact, transport-aware slice-security intent be represented, compiled into coordinated policy artefacts, and statically verified to show that forbidden cross-slice reachability is absent while required shared-service reachability remains available?
 
 In simpler terms:
 
 > Can we write a small security intent, turn it into policy files, and then check whether the resulting model blocks the paths that should be blocked while keeping the one required shared service reachable?
+
+The three research questions remain distinct stages of one pipeline:
+
+- **RQ1 — Intent representation:** compact slice-security intent and schema validation.
+- **RQ2 — Policy compilation:** deterministic compiler producing three coordinated representational artefacts.
+- **RQ3 — Verification:** graph-based reachability checking over the compiled policy-and-topology model.
 
 ## What this repository is trying to show
 
@@ -93,6 +99,8 @@ flowchart LR
     class X1,X2 block;
     class G result;
 ```
+
+**Figure:** Mapping of the thesis research questions to the repository pipeline: RQ1 defines the intent, RQ2 compiles it into three representational artefacts, and RQ3 verifies the resulting policy-and-topology graph.
 
 ## RQ1: compact machine-readable slice-security intent schema
 
@@ -345,17 +353,27 @@ This matters because mistakes can happen between the original intent and the com
 
 The graph step is therefore an assurance check over the post-compilation model, not just a restatement of the original intent.
 
+Negative controls are included to show that the verifier is not merely restating the intended configuration; unsafe or inconsistent cases must be rejected.
+
+## Methodology foundation
+
+Hevner et al. and Peffers et al. justify the design-science framing used in this thesis. Their role is not to provide O-RAN evidence, but to justify artefact construction, demonstration, evaluation, and communication as a valid research method.
+
+This is the relevant methodological pattern for the repository: a bounded problem is defined, artefacts are built, those artefacts are demonstrated in a controlled setting, and the resulting behaviour is evaluated against explicit criteria.
+
 ## Methodology and related-work alignment
 
 The repository follows a research style used in several related works, while keeping the actual contribution narrower and more bounded.
 
 The common pattern is:
 
-- build a proof-of-concept artefact,
-- validate or constrain intent before execution,
-- translate intent into policy or deployment artefacts,
-- evaluate the result in a controlled model, testbed, or prototype,
-- report bounded evidence rather than claiming production-wide assurance.
+- build a proof-of-concept artefact
+- validate or constrain intent before execution
+- translate intent into policy or deployment artefacts
+- evaluate the result in a controlled model, testbed, or prototype
+- report bounded evidence rather than claiming production-wide assurance
+
+The purpose of this comparison is not to argue that any one related work is identical to this thesis. Instead, each work supports one methodological part of the pipeline: intent representation, validation, compilation, multi-domain coordination, zero-trust enforcement, prototype evaluation, or reachability verification. The distinct contribution of this thesis is the bounded integration of these parts around one static cross-slice non-reachability property.
 
 ### Related-work alignment chart
 
@@ -364,53 +382,71 @@ flowchart TD
     DS["Design Science<br/>Build + evaluate artefacts"]
     IV["CAIF / INTPOL<br/>Intent validation + policy translation"]
     MD["NASP / ORANSlice / Limani et al.<br/>Slicing + multi-domain context"]
+    IF["Dik & Berger / Groen et al. / Hung et al.<br/>Transport + interface security context"]
     SC["Scylla<br/>Intent-scoped verification"]
     ZT["OZTrust / THAALOUB<br/>Zero-trust + micro-segmentation motivation"]
 
-    M["This repo<br/>compact slice-security intent<br/>→ compiler<br/>→ policy graph<br/>→ reachability evidence"]
+    M["This repository<br/>compact slice-security intent<br/>→ compiler<br/>→ policy graph<br/>→ reachability evidence"]
 
     DS --> M
     IV --> M
     MD --> M
+    IF --> M
     SC --> M
     ZT --> M
 
     classDef source fill:#eef2ff,stroke:#4f46e5,stroke-width:2px,color:#111;
     classDef mine fill:#e8f5e9,stroke:#2e7d32,stroke-width:3px,color:#111;
 
-    class DS,IV,MD,SC,ZT source;
+    class DS,IV,MD,IF,SC,ZT source;
     class M mine;
 ```
 
-### Comparison table
+### Related work mapped to methodology and evidence
 
-| Related work | Similar methodology/result style | What it proves or evaluates | How my repo uses the idea | Why my contribution remains distinct |
+| Related work | Similar methodology or evidence style | What it evaluates | How it supports this thesis | Why this repository remains distinct |
 | --- | --- | --- | --- | --- |
-| Hevner et al. and Peffers et al. | Design-science problem framing, artefact construction, demonstration, evaluation, and communication | Shows how artefact-centred research can be structured and evaluated | Frames this repo as schema + compiler + verifier artefacts with evaluation evidence | My repo applies design science to one bounded O-RAN-aligned slice-security assurance problem |
-| CAIF | Validates O-RAN slicing intent before actuation through a contract-like guardrail | Evaluates safer intent handling for O-RAN slicing workflows | Supports the need to validate intent before policy generation or actuation | CAIF focuses on agentic/LLM slicing or SLA intent, while this repo focuses on slice-security intent and static reachability verification |
-| NASP | Translates higher-level slice requests into coordinated multi-domain deployment artefacts | Evaluates network-slice-as-a-service orchestration across domains | Supports the idea that slice requests must become coordinated multi-domain outputs | NASP is orchestration/deployment focused, while this repo is security-assurance focused |
-| INTPOL | Translates security intent into controller-level policy and checks conflicts or invariants | Evaluates intent-driven security policy management in SDN-style systems | Supports the intent → policy → verification pattern | INTPOL is generic SDN/security-policy work, while this repo is O-RAN-aligned slice-security with transport/O-Cloud/O-RAN representational artefacts |
-| Scylla | Verifies network intents using intent-specific slices rather than one monolithic model | Evaluates scalable data-plane verification for large networks | Supports scoping verification to the relevant property rather than proving everything | Scylla is a large-scale data-plane verifier, while this repo is a bounded local verifier for cross-slice reachability |
-| ORANSlice | Demonstrates practical O-RAN slicing on open-source testbeds | Evaluates programmable O-RAN slicing capabilities | Supports O-RAN slicing as a realistic implementation context | ORANSlice is a slicing platform, while this repo abstracts the slice model to verify one security property |
-| Limani et al. | Demonstrates slice isolation across RAN, transport, and core domains | Evaluates practical isolation in a 5G slicing proof of concept | Supports the importance of cross-domain isolation | Their work engineers isolation in a deployment, while this repo compiles security intent and verifies reachability in a small model |
-| OZTrust / THAALOUB | Uses zero-trust, access control, and micro-segmentation ideas for O-RAN or cloud-native 5G security | Evaluates least-privilege enforcement, access control, or micro-segmentation | Motivates the repo's default-deny, allowed-path, and blocked-path logic | This repo is not a zero-trust enforcement platform; it is a slice-level assurance pipeline |
+| **CAIF** | Intent-based O-RAN slicing pipeline with contract-style validation before actuation | Safer handling of O-RAN slicing intent before downstream execution | Supports the RQ1/RQ2 logic that O-RAN slicing intent benefits from structured validation before execution | This thesis uses structured security intent and static verification, whereas CAIF focuses on agentic/O-RAN slicing intent and contract-guarded actuation |
+| **NASP** | Higher-level slice requests translated into coordinated multi-domain deployment artefacts | Network-slice-as-a-service orchestration across domains | Supports RQ2 by showing that slice requests need coordinated multi-domain outputs | NASP is orchestration and deployment focused, whereas this repository is security-assurance focused |
+| **INTPOL** | Security intent translated into controller-level policy and checked with bounded formal methods | Intent translation, policy conflict detection, and invariant checking | Strongly supports the intent → policy → verification pattern behind RQ2 and RQ3 | INTPOL is the closest methodological analogue, but it is SDN-focused rather than O-RAN slice-security focused |
+| **Scylla** | Intent-specific reachability and segmentation verification rather than one monolithic network model | Data-plane verification using intent-based slices and performance measurements | Supports RQ3 by showing that verification can be scoped around specific intents rather than requiring a full monolithic model | Scylla is a large-scale data-plane verifier, whereas this repository is a bounded local verifier tied to compiled slice-security artefacts |
+| **ORANSlice** | Open-source O-RAN slicing platform with practical testbed evaluation | Programmable O-RAN slicing, xApps, E2 service models, and slicing demonstrations | Supports O-RAN slicing as a realistic implementation context | ORANSlice is a slicing platform, whereas this repository abstracts the slice model to verify one security property |
+| **Limani et al.** | End-to-end 5G slice isolation proof of concept across RAN, transport, and core | Practical isolation principles across multiple 5G domains | Supports the importance of cross-domain isolation and transport-aware reasoning | Their work engineers isolation in a deployment, whereas this repository compiles security intent and verifies reachability in a small model |
+| **Dik & Berger / Groen et al. / Hung et al.** | Interface and transport security analysis using implementation, emulation, or experimental evidence | Fronthaul, E2, xApp/API, encryption, and open-interface security exposure | Supports the transport-aware and open-interface threat context | These works focus on interface protection and exposure, whereas this repository focuses on slice-security intent compilation and cross-slice reachability assurance |
+| **OZTrust / THAALOUB** | Zero-trust access control, micro-segmentation, and prototype-based evaluation | Least-privilege enforcement, access control, service mesh/CNI, or xApp-level security | Supports the default-deny, allowed-path, blocked-path, and O-Cloud micro-segmentation vocabulary | This repository is not a zero-trust enforcement platform; it is a slice-level static assurance pipeline |
+| **Dzeparoska** | Intent-based management with intent decomposition, policy structures, and assurance/control logic | Intent formalisation, policy decomposition, and autonomic management | Supports the broader intent-management framing around the thesis pipeline | This thesis is narrower, static, and security-specific; it does not claim runtime closed-loop control as a core contribution |
 
-## Evidence style
+## Which part of the thesis pipeline each work resembles
 
-The repository produces evidence in a similar proof-of-concept research style to the works above.
+| Pipeline part | This repository | CAIF | NASP | INTPOL | Scylla | ORANSlice | Limani et al. | OZTrust / THAALOUB |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Intent representation | ✓ compact slice-security intent | ✓ slicing/SLA intent | ✓ higher-level slice request | ✓ security intent | △ intent-specific verification target | △ slicing use-case framing | △ isolation objective | △ access-control or zero-trust intent |
+| Safety / semantic validation | ✓ schema and semantic validation | ✓ contract validation | △ orchestration-side validation | ✓ conflict/invariant checking | △ verifier-side checks | △ platform validation | △ PoC validation | △ policy validation |
+| Policy compilation | ✓ deterministic compiler | △ intent-to-action translation | ✓ multi-domain artefact generation | ✓ intent-to-policy translation | — | △ slicing/control configuration | — | △ policy derivation/enforcement configuration |
+| Multi-domain slice artefacts | ✓ transport + O-Cloud + O-RAN metadata | △ O-RAN actuation path | ✓ core strength | △ controller-level policies | — | ✓ practical slicing artefacts | ✓ RAN/TN/5GC isolation setup | △ multi-layer enforcement rather than slice artefacts |
+| O-Cloud micro-segmentation / zero trust | ✓ representational O-Cloud micro-segmentation | — | △ domain coordination only | △ security-policy viewpoint | — | — | △ isolation motivation | ✓ core emphasis |
+| Reachability or invariant verification | ✓ graph reachability checks | △ safety guardrail | — | ✓ bounded checking/invariants | ✓ strong reachability verification | — | — | △ policy/access-control verification |
+| Prototype / testbed evaluation | ✓ bounded local PoC and evidence pipeline | ✓ O-RAN slicing prototype/testbed | ✓ platform/prototype | ✓ prototype and formal evaluation | ✓ experimental evaluation | ✓ open-source platform/testbed | ✓ practical PoC | ✓ prototype/performance evaluation |
+| Runtime monitoring / future work | Not part of the core claim; treated as future work or optional extension | △ runtime/agentic actuation context | ✓ orchestration/runtime orientation | △ controller/runtime policy context | △ operational verification context | ✓ live slicing platform context | △ deployment context | ✓ enforcement/runtime control context |
 
-The evidence includes:
+Legend: ✓ = strong resemblance, △ = partial resemblance, — = not a major emphasis.
 
-- validation results,
-- generated artefacts,
-- deterministic compiler outputs,
-- graph verification reports,
-- negative-control rejection,
-- overhead metrics.
+## Evidence style and evaluation logic
 
-This evidence is intentionally local and bounded. It is meant to support the thesis claim, not to prove production O-RAN security.
+The evidence style used in this thesis is consistent with bounded systems and design-science research. Comparable systems papers often rely on bounded prototypes, emulated or testbed environments, generated artefacts, validation steps, negative or unsafe cases, performance or overhead measurements, and explicit limitation statements.
 
-## What the repo proves
+The evidence style here is model-based and bounded rather than production-operational. The repository does not try to prove deployment realism across a full O-RAN stack. Its evidence is deliberately compact:
+
+- schema and semantic validation for a bounded slice-security intent
+- deterministic compilation into exactly three coordinated representational artefacts
+- a policy-and-topology graph built after compilation
+- static reachability checks for required and forbidden paths
+- negative controls showing that unsafe or inconsistent cases are rejected
+- modest local overhead reporting with explicit limitations
+
+This narrower evidence style is a feature of the thesis framing, not a weakness in itself. It matches the bounded claim: one reproducible static assurance workflow for one cross-slice non-reachability property in a small O-RAN-aligned proof of concept.
+
+## What the repository proves
 
 Within the bounded local model, the repository demonstrates that:
 
@@ -423,7 +459,7 @@ Within the bounded local model, the repository demonstrates that:
 - negative-control misconfigurations are detected
 - modest local proof-of-concept overhead can be reported
 
-## What the repo does not prove
+## What the repository does not prove
 
 The repository does not claim:
 
@@ -475,5 +511,8 @@ cat results/metrics/overhead_metrics.json
 
 RQ1 defines the security intent, RQ2 compiles it into three coordinated policy artefacts, and RQ3 checks the compiled policy-and-topology model for required and forbidden reachability.
 
+The comparison shows that the thesis is not isolated from the field: its individual components are supported by established patterns in intent-based management, slice orchestration, zero-trust enforcement, prototype evaluation, and reachability verification.
+
 Similar works cover parts of the pipeline, but this thesis integrates compact slice-security intent, coordinated policy compilation, and static cross-slice reachability verification in one small O-RAN-aligned proof of concept.
 
+This is presented as a bounded integration contribution, not as a claim that the repository replaces production O-RAN slicing, live RIC/xApp control, Kubernetes enforcement, or complete zero-trust deployment.
