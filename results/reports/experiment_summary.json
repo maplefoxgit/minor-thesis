@@ -329,27 +329,27 @@
       "status": "pass",
       "validation_time": {
         "stage": "validation",
-        "wall_clock_seconds": 0.01996420801151544,
-        "cpu_seconds": 0.019951999999999998,
-        "peak_python_tracemalloc_bytes": 29800
+        "wall_clock_seconds": 0.043988707999233156,
+        "cpu_seconds": 0.043247000000000035,
+        "peak_python_tracemalloc_bytes": 29471
       },
       "compile_time": {
         "stage": "compile",
-        "wall_clock_seconds": 0.021958666999125853,
-        "cpu_seconds": 0.021932000000000007,
-        "peak_python_tracemalloc_bytes": 147132
+        "wall_clock_seconds": 0.04604016701341607,
+        "cpu_seconds": 0.045623000000000025,
+        "peak_python_tracemalloc_bytes": 147111
       },
       "graph_construction_time": {
         "stage": "graph_construction",
-        "wall_clock_seconds": 0.004385582986287773,
-        "cpu_seconds": 0.004380999999999996,
-        "peak_python_tracemalloc_bytes": 208254
+        "wall_clock_seconds": 0.009604624996427447,
+        "cpu_seconds": 0.00945600000000002,
+        "peak_python_tracemalloc_bytes": 208258
       },
       "verification_time": {
         "stage": "verification",
-        "wall_clock_seconds": 0.005782249994808808,
-        "cpu_seconds": 0.005773,
-        "peak_python_tracemalloc_bytes": 208222
+        "wall_clock_seconds": 0.013421167008345947,
+        "cpu_seconds": 0.013020000000000032,
+        "peak_python_tracemalloc_bytes": 208226
       },
       "generated_policy_file_sizes_bytes": {
         "ocloud_microsegmentation.generated.yaml": 595,
@@ -365,10 +365,10 @@
       },
       "graph_node_count": 8,
       "graph_edge_count": 5,
-      "peak_python_tracemalloc_bytes_max": 208254,
+      "peak_python_tracemalloc_bytes_max": 208258,
       "memory_measurement_basis": "Python tracemalloc peak bytes (not process RSS)",
-      "overall_wall_clock_seconds": 0.05209070799173787,
-      "overall_cpu_seconds": 0.052038,
+      "overall_wall_clock_seconds": 0.11305466701742262,
+      "overall_cpu_seconds": 0.11134600000000011,
       "local_overhead_statement": "These measurements report modest local proof-of-concept overhead only. They do not establish production scalability."
     }
   },

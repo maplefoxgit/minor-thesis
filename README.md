@@ -79,6 +79,11 @@ These guides are additive teaching layers. They do not replace the current bound
 - Read [`examples/universal-template/README.md`](examples/universal-template/README.md) for the domain-neutral reusable pattern.
 - Come back to this main README when you want the exact commands, artefacts, and thesis boundaries.
 
+
+## Methodology and RQ Mapping
+
+For a supervisor-facing explanation of how the repository maps to the thesis research questions, methodology pipeline, generated artefacts, related-work patterns, and bounded evidence claim, see [`docs/rq_to_repo_mapping.md`](docs/rq_to_repo_mapping.md).
+
 ## Repository Structure
 
 ```text
@@ -222,3 +227,4 @@ Then inspect:
 ## Bounded Limitations
 
 This repository proves only model-based static non-reachability in the local policy-and-topology model. It does not establish runtime enforcement, runtime drift resistance, packet delivery guarantees, cryptographic protection, live O-RAN behavior, or complete end-to-end O-RAN security.
+
