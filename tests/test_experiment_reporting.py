@@ -15,6 +15,7 @@ from run_e1_schema_expressiveness import run as run_e1  # noqa: E402
 from run_e3_reachability_verification import run as run_e3  # noqa: E402
 from run_e4_negative_controls import run as run_e4  # noqa: E402
 from run_e5_overhead import run as run_e5  # noqa: E402
+from run_e6_controlled_baselines import run as run_e6  # noqa: E402
 from run_all_experiments import run as run_all_experiments  # noqa: E402
 
 
@@ -62,6 +63,8 @@ def test_experiment_reports_use_repository_relative_paths() -> None:
         "experiment_summary_json": "results/reports/experiment_summary.json",
         "experiment_summary_md": "results/reports/experiment_summary.md",
         "overhead_metrics_json": "results/metrics/overhead_metrics.json",
+        "baseline_comparison_json": "results/reports/baseline_comparison.json",
+        "baseline_comparison_md": "results/reports/baseline_comparison.md",
     }
 
 
@@ -71,3 +74,12 @@ def test_e5_memory_reporting_is_labelled_as_tracemalloc() -> None:
     assert result["memory_measurement_basis"] == "Python tracemalloc peak bytes (not process RSS)"
     assert "peak_python_tracemalloc_bytes_max" in result
     assert "peak_memory_bytes_max" not in result
+
+
+def test_e6_reports_controlled_comparison_outputs() -> None:
+    result = run_e6()
+
+    assert result["status"] == "pass"
+    assert result["comparison"]["only_condition_satisfying_all_objectives"] == (
+        "proposed_compiled_policy"
+    )

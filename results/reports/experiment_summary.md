@@ -2,7 +2,7 @@
 
 ## Summary
 - Overall status: `pass`
-- Passed experiments: 5
+- Passed experiments: 6
 - Failed experiments: 0
 - Thesis interpretation: the bounded proof of concept demonstrates only local, model-based evidence for the fixed two-slice scenario and does not claim production assurance.
 
@@ -55,11 +55,18 @@
 - Status: `pass`
 - Graph size: nodes=8, edges=5
 - Generated rule count: 10
-- Peak Python tracemalloc bytes (max stage): 208258 bytes
-- Overall wall-clock time: 0.113055 seconds
-- Overall CPU time: 0.111346 seconds
+- Peak Python tracemalloc bytes (max stage): 208418 bytes
+- Overall wall-clock time: 0.121371 seconds
+- Overall CPU time: 0.116913 seconds
 - Memory measurement basis: Python tracemalloc peak bytes (not process RSS)
 - Local overhead note: These measurements report modest local proof-of-concept overhead only. They do not establish production scalability.
+
+### E6 Controlled baseline comparison
+- Status: `pass`
+- permissive_topology_only: edges=10, required_reachability=100%, forbidden_path_blocking=0%, terminal_service_passed=`False`, balanced_objective_passed=`False`
+- deny_all: edges=0, required_reachability=0%, forbidden_path_blocking=100%, terminal_service_passed=`True`, balanced_objective_passed=`False`
+- proposed_compiled_policy: edges=5, required_reachability=100%, forbidden_path_blocking=100%, terminal_service_passed=`True`, balanced_objective_passed=`True`
+- Unique balanced condition: `proposed_compiled_policy`
 
 ## Result Files
 - Verification report JSON: `results/reports/verification_report.json`
@@ -67,6 +74,8 @@
 - Experiment summary JSON: `results/reports/experiment_summary.json`
 - Experiment summary Markdown: `results/reports/experiment_summary.md`
 - Overhead metrics JSON: `results/metrics/overhead_metrics.json`
+- Baseline comparison JSON: `results/reports/baseline_comparison.json`
+- Baseline comparison Markdown: `results/reports/baseline_comparison.md`
 
 ## Limitations
 This evidence proves only bounded, model-based static behavior in the local proof-of-concept representation. It does not establish runtime security, packet delivery outcomes, live O-RAN control behavior, or production scalability.

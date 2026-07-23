@@ -9,7 +9,7 @@ It implements a fixed local pipeline that:
 1. validates a bounded two-slice slice-security intent,
 2. deterministically compiles exactly three representational policy artefacts,
 3. verifies static reachability and non-reachability over the compiled local model,
-4. runs the E1-E5 evaluation automation and writes thesis evidence under `results/`.
+4. runs the E1-E6 evaluation automation and writes thesis evidence under `results/`.
 
 ## Thesis Claim
 
@@ -20,7 +20,8 @@ The thesis claim supported by this repository is intentionally narrow:
 - deterministic representational policy compilation,
 - deterministic static graph-based reachability verification,
 - negative-control rejection for bounded misconfiguration cases,
-- modest local overhead reporting.
+- a controlled comparison against permissive topology-only and deny-all baselines,
+- modest local overhead reporting with an optional repeated benchmark.
 
 This proves only model-based static non-reachability in the local policy-and-topology model.
 
@@ -113,7 +114,7 @@ Important implementation areas:
 - `src/oran_slice_security/compiler.py`: RQ2 deterministic compiler.
 - `src/oran_slice_security/graph_builder.py`: compiled policy-and-topology graph construction.
 - `src/oran_slice_security/verifier.py`: RQ3 deterministic breadth-first search verification.
-- `experiments/`: E1-E5 automation.
+- `experiments/`: E1-E6 automation plus the optional repeated E5 benchmark.
 - `results/`: generated thesis evidence.
 
 ## Commands
@@ -155,7 +156,11 @@ python experiments/run_e2_compiler_coherence.py
 python experiments/run_e3_reachability_verification.py
 python experiments/run_e4_negative_controls.py
 python experiments/run_e5_overhead.py
+python experiments/run_e6_controlled_baselines.py
 python experiments/run_all_experiments.py
+
+# Optional 5-warm-up, 30-trial E5 distribution
+python experiments/run_e5_repeated.py --warmups 5 --trials 30
 ```
 
 ## Expected Outputs
@@ -179,6 +184,13 @@ The experiment automation writes:
 - `results/reports/experiment_summary.json`
 - `results/reports/experiment_summary.md`
 - `results/metrics/overhead_metrics.json`
+- `results/reports/baseline_comparison.json`
+- `results/reports/baseline_comparison.md`
+
+The optional repeated E5 benchmark writes:
+
+- `results/metrics/overhead_repeated.json`
+- `results/metrics/overhead_repeated.csv`
 
 ## Why The Policy Artefacts Are Representational
 
@@ -197,6 +209,7 @@ They do **not** claim:
 - `E3 Reachability verification`: confirms both permitted paths to `shared_auth_log` survive while forbidden cross-slice paths do not.
 - `E4 Negative-control misconfiguration`: confirms each negative-control topology is rejected with a useful reason, including an over-restrictive case that breaks required reachability to `shared_auth_log`.
 - `E5 Practical overhead`: reports local timing, CPU, Python `tracemalloc` peak allocation, file size, rule count, and graph-size evidence without making a production scalability claim.
+- `E6 Controlled baseline comparison`: holds the node set, query set, source topology, and verifier constant while comparing permissive topology-only, deny-all, and proposed compiled-policy edge conditions.
 
 ## How To Reproduce Reports
 
@@ -207,22 +220,26 @@ make install
 source .venv/bin/activate
 make run-all
 python experiments/run_all_experiments.py
+python experiments/run_e5_repeated.py --warmups 5 --trials 30
 ```
 
-Then inspect:
+A successful revised run reports 50 tests passing and six experiment groups passing. Then inspect:
 
 - `results/reports/verification_report.json`
 - `results/reports/verification_report.md`
 - `results/reports/experiment_summary.json`
 - `results/reports/experiment_summary.md`
 - `results/metrics/overhead_metrics.json`
+- `results/metrics/overhead_repeated.json`
+- `results/reports/baseline_comparison.json`
+- `results/reports/baseline_comparison.md`
 
 ## How To Interpret Pass And Fail
 
 - `pass` means the bounded local model behaved exactly as the fixed methodology requires.
 - `fail` means the repository detected a structural, semantic, compilation, reachability, or negative-control violation relative to the fixed bounded design.
 - A passing verification report means only the modeled graph satisfied the required reachability and non-reachability properties.
-- A passing experiment summary means E1-E5 all completed successfully within the bounded local proof of concept.
+- A passing experiment summary means E1-E6 all completed successfully within the bounded local proof of concept.
 
 ## Bounded Limitations
 

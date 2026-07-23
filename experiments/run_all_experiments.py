@@ -6,6 +6,8 @@ from _common import (
     EXPERIMENT_SUMMARY_JSON,
     EXPERIMENT_SUMMARY_MD,
     OVERHEAD_METRICS_JSON,
+    BASELINE_COMPARISON_JSON,
+    BASELINE_COMPARISON_MD,
     REPORTS_DIR,
     print_json,
     rel,
@@ -17,6 +19,7 @@ from run_e2_compiler_coherence import run as run_e2
 from run_e3_reachability_verification import run as run_e3
 from run_e4_negative_controls import run as run_e4
 from run_e5_overhead import run as run_e5
+from run_e6_controlled_baselines import run as run_e6
 
 
 EXPERIMENT_ORDER = [
@@ -25,6 +28,7 @@ EXPERIMENT_ORDER = [
     ("E3", run_e3),
     ("E4", run_e4),
     ("E5", run_e5),
+    ("E6", run_e6),
 ]
 
 
@@ -41,8 +45,8 @@ def run() -> dict[str, Any]:
         "experiments": experiment_results,
         "bounded_claim": (
             "The evidence supports only bounded, local, model-based validation, compilation, "
-            "static non-reachability verification, negative-control rejection, and modest "
-            "local overhead reporting."
+            "static non-reachability verification, negative-control rejection, controlled "
+            "baseline comparison, and modest local overhead reporting."
         ),
         "result_files": {
             "verification_report_json": rel(REPORTS_DIR / "verification_report.json"),
@@ -50,6 +54,8 @@ def run() -> dict[str, Any]:
             "experiment_summary_json": rel(EXPERIMENT_SUMMARY_JSON),
             "experiment_summary_md": rel(EXPERIMENT_SUMMARY_MD),
             "overhead_metrics_json": rel(OVERHEAD_METRICS_JSON),
+            "baseline_comparison_json": rel(BASELINE_COMPARISON_JSON),
+            "baseline_comparison_md": rel(BASELINE_COMPARISON_MD),
         },
     }
     write_json(EXPERIMENT_SUMMARY_JSON, summary_document)
@@ -146,6 +152,20 @@ def render_experiment_summary_markdown(summary_document: dict[str, Any]) -> str:
             )
             lines.append(f"- Local overhead note: {result['local_overhead_statement']}")
 
+        if experiment_id == "E6":
+            for condition_id, condition in result["conditions"].items():
+                lines.append(
+                    f"- {condition_id}: edges={condition['graph_edge_count']}, "
+                    f"required_reachability={condition['required_reachability_rate']:.0%}, "
+                    f"forbidden_path_blocking={condition['forbidden_path_block_rate']:.0%}, "
+                    f"terminal_service_passed=`{condition['terminal_service_passed']}`, "
+                    f"balanced_objective_passed=`{condition['balanced_objective_passed']}`"
+                )
+            lines.append(
+                "- Unique balanced condition: "
+                f"`{result['comparison']['only_condition_satisfying_all_objectives']}`"
+            )
+
         lines.append("")
 
     lines.extend(
@@ -156,6 +176,8 @@ def render_experiment_summary_markdown(summary_document: dict[str, Any]) -> str:
             f"- Experiment summary JSON: `{summary_document['result_files']['experiment_summary_json']}`",
             f"- Experiment summary Markdown: `{summary_document['result_files']['experiment_summary_md']}`",
             f"- Overhead metrics JSON: `{summary_document['result_files']['overhead_metrics_json']}`",
+            f"- Baseline comparison JSON: `{summary_document['result_files']['baseline_comparison_json']}`",
+            f"- Baseline comparison Markdown: `{summary_document['result_files']['baseline_comparison_md']}`",
             "",
             "## Limitations",
             (

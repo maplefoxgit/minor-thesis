@@ -1,0 +1,708 @@
+{
+  "experiment_id": "E6",
+  "title": "Controlled baseline comparison",
+  "status": "pass",
+  "controlled_variables": {
+    "source_topology": "topology/base_topology.yaml",
+    "node_count": 8,
+    "required_query_count": 2,
+    "forbidden_query_count": 4,
+    "terminal_service_count": 1,
+    "verification_algorithm": "deterministic breadth-first search",
+    "changed_factor": "permitted communication-edge condition"
+  },
+  "conditions": {
+    "permissive_topology_only": {
+      "condition_id": "permissive_topology_only",
+      "description": "No generated policy: every non-governance topology adjacency is available in both directions.",
+      "graph_node_count": 8,
+      "graph_edge_count": 10,
+      "required_reachable_pass_count": 2,
+      "required_reachable_count": 2,
+      "required_reachability_rate": 1.0,
+      "forbidden_unreachable_pass_count": 0,
+      "forbidden_unreachable_count": 4,
+      "forbidden_path_block_rate": 0.0,
+      "terminal_service_passed": false,
+      "balanced_objective_passed": false,
+      "verification_report": {
+        "overall_status": "fail",
+        "required_reachable": [
+          {
+            "source": "slice_a_workload",
+            "destination": "shared_auth_log",
+            "status": "pass",
+            "path": [
+              "slice_a_workload",
+              "tn_segment_slice_a",
+              "tn_segment_shared",
+              "shared_auth_log"
+            ],
+            "edge_provenance": [
+              {
+                "source": "slice_a_workload",
+                "destination": "tn_segment_slice_a",
+                "provenance": [
+                  "permissive_topology_only_baseline"
+                ]
+              },
+              {
+                "source": "tn_segment_slice_a",
+                "destination": "tn_segment_shared",
+                "provenance": [
+                  "permissive_topology_only_baseline"
+                ]
+              },
+              {
+                "source": "tn_segment_shared",
+                "destination": "shared_auth_log",
+                "provenance": [
+                  "permissive_topology_only_baseline"
+                ]
+              }
+            ]
+          },
+          {
+            "source": "slice_b_workload",
+            "destination": "shared_auth_log",
+            "status": "pass",
+            "path": [
+              "slice_b_workload",
+              "tn_segment_slice_b",
+              "tn_segment_shared",
+              "shared_auth_log"
+            ],
+            "edge_provenance": [
+              {
+                "source": "slice_b_workload",
+                "destination": "tn_segment_slice_b",
+                "provenance": [
+                  "permissive_topology_only_baseline"
+                ]
+              },
+              {
+                "source": "tn_segment_slice_b",
+                "destination": "tn_segment_shared",
+                "provenance": [
+                  "permissive_topology_only_baseline"
+                ]
+              },
+              {
+                "source": "tn_segment_shared",
+                "destination": "shared_auth_log",
+                "provenance": [
+                  "permissive_topology_only_baseline"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbidden_unreachable": [
+          {
+            "source": "slice_a_workload",
+            "destination": "slice_b_workload",
+            "status": "fail",
+            "violation_path": [
+              "slice_a_workload",
+              "tn_segment_slice_a",
+              "tn_segment_shared",
+              "tn_segment_slice_b",
+              "slice_b_workload"
+            ],
+            "edge_provenance": [
+              {
+                "source": "slice_a_workload",
+                "destination": "tn_segment_slice_a",
+                "provenance": [
+                  "permissive_topology_only_baseline"
+                ]
+              },
+              {
+                "source": "tn_segment_slice_a",
+                "destination": "tn_segment_shared",
+                "provenance": [
+                  "permissive_topology_only_baseline"
+                ]
+              },
+              {
+                "source": "tn_segment_shared",
+                "destination": "tn_segment_slice_b",
+                "provenance": [
+                  "permissive_topology_only_baseline"
+                ]
+              },
+              {
+                "source": "tn_segment_slice_b",
+                "destination": "slice_b_workload",
+                "provenance": [
+                  "permissive_topology_only_baseline"
+                ]
+              }
+            ]
+          },
+          {
+            "source": "slice_b_workload",
+            "destination": "slice_a_workload",
+            "status": "fail",
+            "violation_path": [
+              "slice_b_workload",
+              "tn_segment_slice_b",
+              "tn_segment_shared",
+              "tn_segment_slice_a",
+              "slice_a_workload"
+            ],
+            "edge_provenance": [
+              {
+                "source": "slice_b_workload",
+                "destination": "tn_segment_slice_b",
+                "provenance": [
+                  "permissive_topology_only_baseline"
+                ]
+              },
+              {
+                "source": "tn_segment_slice_b",
+                "destination": "tn_segment_shared",
+                "provenance": [
+                  "permissive_topology_only_baseline"
+                ]
+              },
+              {
+                "source": "tn_segment_shared",
+                "destination": "tn_segment_slice_a",
+                "provenance": [
+                  "permissive_topology_only_baseline"
+                ]
+              },
+              {
+                "source": "tn_segment_slice_a",
+                "destination": "slice_a_workload",
+                "provenance": [
+                  "permissive_topology_only_baseline"
+                ]
+              }
+            ]
+          },
+          {
+            "source": "tn_segment_slice_a",
+            "destination": "tn_segment_slice_b",
+            "status": "fail",
+            "violation_path": [
+              "tn_segment_slice_a",
+              "tn_segment_shared",
+              "tn_segment_slice_b"
+            ],
+            "edge_provenance": [
+              {
+                "source": "tn_segment_slice_a",
+                "destination": "tn_segment_shared",
+                "provenance": [
+                  "permissive_topology_only_baseline"
+                ]
+              },
+              {
+                "source": "tn_segment_shared",
+                "destination": "tn_segment_slice_b",
+                "provenance": [
+                  "permissive_topology_only_baseline"
+                ]
+              }
+            ]
+          },
+          {
+            "source": "tn_segment_slice_b",
+            "destination": "tn_segment_slice_a",
+            "status": "fail",
+            "violation_path": [
+              "tn_segment_slice_b",
+              "tn_segment_shared",
+              "tn_segment_slice_a"
+            ],
+            "edge_provenance": [
+              {
+                "source": "tn_segment_slice_b",
+                "destination": "tn_segment_shared",
+                "provenance": [
+                  "permissive_topology_only_baseline"
+                ]
+              },
+              {
+                "source": "tn_segment_shared",
+                "destination": "tn_segment_slice_a",
+                "provenance": [
+                  "permissive_topology_only_baseline"
+                ]
+              }
+            ]
+          }
+        ],
+        "terminal_service_transit": [
+          {
+            "service": "shared_auth_log",
+            "status": "fail",
+            "outgoing_edges": [
+              "tn_segment_shared"
+            ],
+            "violation_paths": [
+              {
+                "destination": "slice_a_workload",
+                "path": [
+                  "shared_auth_log",
+                  "tn_segment_shared",
+                  "tn_segment_slice_a",
+                  "slice_a_workload"
+                ],
+                "edge_provenance": [
+                  {
+                    "source": "shared_auth_log",
+                    "destination": "tn_segment_shared",
+                    "provenance": [
+                      "permissive_topology_only_baseline"
+                    ]
+                  },
+                  {
+                    "source": "tn_segment_shared",
+                    "destination": "tn_segment_slice_a",
+                    "provenance": [
+                      "permissive_topology_only_baseline"
+                    ]
+                  },
+                  {
+                    "source": "tn_segment_slice_a",
+                    "destination": "slice_a_workload",
+                    "provenance": [
+                      "permissive_topology_only_baseline"
+                    ]
+                  }
+                ]
+              },
+              {
+                "destination": "slice_b_workload",
+                "path": [
+                  "shared_auth_log",
+                  "tn_segment_shared",
+                  "tn_segment_slice_b",
+                  "slice_b_workload"
+                ],
+                "edge_provenance": [
+                  {
+                    "source": "shared_auth_log",
+                    "destination": "tn_segment_shared",
+                    "provenance": [
+                      "permissive_topology_only_baseline"
+                    ]
+                  },
+                  {
+                    "source": "tn_segment_shared",
+                    "destination": "tn_segment_slice_b",
+                    "provenance": [
+                      "permissive_topology_only_baseline"
+                    ]
+                  },
+                  {
+                    "source": "tn_segment_slice_b",
+                    "destination": "slice_b_workload",
+                    "provenance": [
+                      "permissive_topology_only_baseline"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "paths_found_for_reachable_paths": [
+          {
+            "source": "slice_a_workload",
+            "destination": "shared_auth_log",
+            "path": [
+              "slice_a_workload",
+              "tn_segment_slice_a",
+              "tn_segment_shared",
+              "shared_auth_log"
+            ]
+          },
+          {
+            "source": "slice_b_workload",
+            "destination": "shared_auth_log",
+            "path": [
+              "slice_b_workload",
+              "tn_segment_slice_b",
+              "tn_segment_shared",
+              "shared_auth_log"
+            ]
+          }
+        ],
+        "paths_found_for_violations": [
+          {
+            "source": "slice_a_workload",
+            "destination": "slice_b_workload",
+            "path": [
+              "slice_a_workload",
+              "tn_segment_slice_a",
+              "tn_segment_shared",
+              "tn_segment_slice_b",
+              "slice_b_workload"
+            ]
+          },
+          {
+            "source": "slice_b_workload",
+            "destination": "slice_a_workload",
+            "path": [
+              "slice_b_workload",
+              "tn_segment_slice_b",
+              "tn_segment_shared",
+              "tn_segment_slice_a",
+              "slice_a_workload"
+            ]
+          },
+          {
+            "source": "tn_segment_slice_a",
+            "destination": "tn_segment_slice_b",
+            "path": [
+              "tn_segment_slice_a",
+              "tn_segment_shared",
+              "tn_segment_slice_b"
+            ]
+          },
+          {
+            "source": "tn_segment_slice_b",
+            "destination": "tn_segment_slice_a",
+            "path": [
+              "tn_segment_slice_b",
+              "tn_segment_shared",
+              "tn_segment_slice_a"
+            ]
+          },
+          {
+            "source": "shared_auth_log",
+            "destination": "slice_a_workload",
+            "path": [
+              "shared_auth_log",
+              "tn_segment_shared",
+              "tn_segment_slice_a",
+              "slice_a_workload"
+            ]
+          },
+          {
+            "source": "shared_auth_log",
+            "destination": "slice_b_workload",
+            "path": [
+              "shared_auth_log",
+              "tn_segment_shared",
+              "tn_segment_slice_b",
+              "slice_b_workload"
+            ]
+          }
+        ],
+        "edge_provenance": {
+          "shared_auth_log->tn_segment_shared": [
+            "permissive_topology_only_baseline"
+          ],
+          "slice_a_workload->tn_segment_slice_a": [
+            "permissive_topology_only_baseline"
+          ],
+          "slice_b_workload->tn_segment_slice_b": [
+            "permissive_topology_only_baseline"
+          ],
+          "tn_segment_shared->shared_auth_log": [
+            "permissive_topology_only_baseline"
+          ],
+          "tn_segment_shared->tn_segment_slice_a": [
+            "permissive_topology_only_baseline"
+          ],
+          "tn_segment_shared->tn_segment_slice_b": [
+            "permissive_topology_only_baseline"
+          ],
+          "tn_segment_slice_a->slice_a_workload": [
+            "permissive_topology_only_baseline"
+          ],
+          "tn_segment_slice_a->tn_segment_shared": [
+            "permissive_topology_only_baseline"
+          ],
+          "tn_segment_slice_b->slice_b_workload": [
+            "permissive_topology_only_baseline"
+          ],
+          "tn_segment_slice_b->tn_segment_shared": [
+            "permissive_topology_only_baseline"
+          ]
+        },
+        "graph_node_count": 8,
+        "graph_edge_count": 10
+      }
+    },
+    "deny_all": {
+      "condition_id": "deny_all",
+      "description": "All communication edges are removed.",
+      "graph_node_count": 8,
+      "graph_edge_count": 0,
+      "required_reachable_pass_count": 0,
+      "required_reachable_count": 2,
+      "required_reachability_rate": 0.0,
+      "forbidden_unreachable_pass_count": 4,
+      "forbidden_unreachable_count": 4,
+      "forbidden_path_block_rate": 1.0,
+      "terminal_service_passed": true,
+      "balanced_objective_passed": false,
+      "verification_report": {
+        "overall_status": "fail",
+        "required_reachable": [
+          {
+            "source": "slice_a_workload",
+            "destination": "shared_auth_log",
+            "status": "fail",
+            "path": null,
+            "edge_provenance": []
+          },
+          {
+            "source": "slice_b_workload",
+            "destination": "shared_auth_log",
+            "status": "fail",
+            "path": null,
+            "edge_provenance": []
+          }
+        ],
+        "forbidden_unreachable": [
+          {
+            "source": "slice_a_workload",
+            "destination": "slice_b_workload",
+            "status": "pass",
+            "violation_path": null,
+            "edge_provenance": []
+          },
+          {
+            "source": "slice_b_workload",
+            "destination": "slice_a_workload",
+            "status": "pass",
+            "violation_path": null,
+            "edge_provenance": []
+          },
+          {
+            "source": "tn_segment_slice_a",
+            "destination": "tn_segment_slice_b",
+            "status": "pass",
+            "violation_path": null,
+            "edge_provenance": []
+          },
+          {
+            "source": "tn_segment_slice_b",
+            "destination": "tn_segment_slice_a",
+            "status": "pass",
+            "violation_path": null,
+            "edge_provenance": []
+          }
+        ],
+        "terminal_service_transit": [
+          {
+            "service": "shared_auth_log",
+            "status": "pass",
+            "outgoing_edges": [],
+            "violation_paths": []
+          }
+        ],
+        "paths_found_for_reachable_paths": [],
+        "paths_found_for_violations": [],
+        "edge_provenance": {},
+        "graph_node_count": 8,
+        "graph_edge_count": 0
+      }
+    },
+    "proposed_compiled_policy": {
+      "condition_id": "proposed_compiled_policy",
+      "description": "The validated intent is compiled into coordinated transport, O-Cloud, and slice-scoped O-RAN policy artefacts.",
+      "graph_node_count": 8,
+      "graph_edge_count": 5,
+      "required_reachable_pass_count": 2,
+      "required_reachable_count": 2,
+      "required_reachability_rate": 1.0,
+      "forbidden_unreachable_pass_count": 4,
+      "forbidden_unreachable_count": 4,
+      "forbidden_path_block_rate": 1.0,
+      "terminal_service_passed": true,
+      "balanced_objective_passed": true,
+      "verification_report": {
+        "overall_status": "pass",
+        "required_reachable": [
+          {
+            "source": "slice_a_workload",
+            "destination": "shared_auth_log",
+            "status": "pass",
+            "path": [
+              "slice_a_workload",
+              "tn_segment_slice_a",
+              "tn_segment_shared",
+              "shared_auth_log"
+            ],
+            "edge_provenance": [
+              {
+                "source": "slice_a_workload",
+                "destination": "tn_segment_slice_a",
+                "provenance": [
+                  "topology",
+                  "ocloud_microsegmentation",
+                  "oran_slice_policy"
+                ]
+              },
+              {
+                "source": "tn_segment_slice_a",
+                "destination": "tn_segment_shared",
+                "provenance": [
+                  "topology",
+                  "transport_policy",
+                  "oran_slice_policy"
+                ]
+              },
+              {
+                "source": "tn_segment_shared",
+                "destination": "shared_auth_log",
+                "provenance": [
+                  "topology",
+                  "ocloud_microsegmentation",
+                  "oran_slice_policy"
+                ]
+              }
+            ]
+          },
+          {
+            "source": "slice_b_workload",
+            "destination": "shared_auth_log",
+            "status": "pass",
+            "path": [
+              "slice_b_workload",
+              "tn_segment_slice_b",
+              "tn_segment_shared",
+              "shared_auth_log"
+            ],
+            "edge_provenance": [
+              {
+                "source": "slice_b_workload",
+                "destination": "tn_segment_slice_b",
+                "provenance": [
+                  "topology",
+                  "ocloud_microsegmentation",
+                  "oran_slice_policy"
+                ]
+              },
+              {
+                "source": "tn_segment_slice_b",
+                "destination": "tn_segment_shared",
+                "provenance": [
+                  "topology",
+                  "transport_policy",
+                  "oran_slice_policy"
+                ]
+              },
+              {
+                "source": "tn_segment_shared",
+                "destination": "shared_auth_log",
+                "provenance": [
+                  "topology",
+                  "ocloud_microsegmentation",
+                  "oran_slice_policy"
+                ]
+              }
+            ]
+          }
+        ],
+        "forbidden_unreachable": [
+          {
+            "source": "slice_a_workload",
+            "destination": "slice_b_workload",
+            "status": "pass",
+            "violation_path": null,
+            "edge_provenance": []
+          },
+          {
+            "source": "slice_b_workload",
+            "destination": "slice_a_workload",
+            "status": "pass",
+            "violation_path": null,
+            "edge_provenance": []
+          },
+          {
+            "source": "tn_segment_slice_a",
+            "destination": "tn_segment_slice_b",
+            "status": "pass",
+            "violation_path": null,
+            "edge_provenance": []
+          },
+          {
+            "source": "tn_segment_slice_b",
+            "destination": "tn_segment_slice_a",
+            "status": "pass",
+            "violation_path": null,
+            "edge_provenance": []
+          }
+        ],
+        "terminal_service_transit": [
+          {
+            "service": "shared_auth_log",
+            "status": "pass",
+            "outgoing_edges": [],
+            "violation_paths": []
+          }
+        ],
+        "paths_found_for_reachable_paths": [
+          {
+            "source": "slice_a_workload",
+            "destination": "shared_auth_log",
+            "path": [
+              "slice_a_workload",
+              "tn_segment_slice_a",
+              "tn_segment_shared",
+              "shared_auth_log"
+            ]
+          },
+          {
+            "source": "slice_b_workload",
+            "destination": "shared_auth_log",
+            "path": [
+              "slice_b_workload",
+              "tn_segment_slice_b",
+              "tn_segment_shared",
+              "shared_auth_log"
+            ]
+          }
+        ],
+        "paths_found_for_violations": [],
+        "edge_provenance": {
+          "slice_a_workload->tn_segment_slice_a": [
+            "topology",
+            "ocloud_microsegmentation",
+            "oran_slice_policy"
+          ],
+          "slice_b_workload->tn_segment_slice_b": [
+            "topology",
+            "ocloud_microsegmentation",
+            "oran_slice_policy"
+          ],
+          "tn_segment_shared->shared_auth_log": [
+            "topology",
+            "ocloud_microsegmentation",
+            "oran_slice_policy"
+          ],
+          "tn_segment_slice_a->tn_segment_shared": [
+            "topology",
+            "transport_policy",
+            "oran_slice_policy"
+          ],
+          "tn_segment_slice_b->tn_segment_shared": [
+            "topology",
+            "transport_policy",
+            "oran_slice_policy"
+          ]
+        },
+        "graph_node_count": 8,
+        "graph_edge_count": 5
+      }
+    }
+  },
+  "comparison": {
+    "only_condition_satisfying_all_objectives": "proposed_compiled_policy",
+    "safety_gain_vs_permissive_percentage_points": 100.0,
+    "availability_retention_vs_permissive_percentage": 100.0,
+    "availability_gain_vs_deny_all_percentage_points": 100.0,
+    "edge_reduction_vs_permissive_count": 5,
+    "edge_reduction_vs_permissive_percentage": 50.0
+  },
+  "interpretation_boundary": "The comparison is controlled and deterministic within one synthetic eight-node model. It demonstrates the safety-availability trade-off of the three edge conditions, not superiority over production O-RAN policy systems."
+}

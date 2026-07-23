@@ -8,3 +8,6 @@ __pycache__/
 .ruff_cache/
 .coverage
 htmlcov/
+
+# Local repository archives
+minor-thesis-*.zip

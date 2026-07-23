@@ -294,6 +294,7 @@ RQ3 is shown by:
 - `shared_auth_log` has no outgoing transit path
 - negative-control misconfigurations are rejected
 - overhead metrics are reported
+- the proposed condition is compared with permissive topology-only and deny-all controls
 
 Relevant outputs include:
 
@@ -302,14 +303,27 @@ Relevant outputs include:
 - `results/reports/experiment_summary.json`
 - `results/reports/experiment_summary.md`
 - `results/metrics/overhead_metrics.json`
+- `results/metrics/overhead_repeated.json`
+- `results/reports/baseline_comparison.json`
+- `results/reports/baseline_comparison.md`
 
 ### What RQ3 proves
 
-RQ3 shows that, in the bounded local policy-and-topology model, the compiled artefacts preserve required shared-service reachability and remove forbidden cross-slice reachability.
+RQ3 shows that, in the bounded local policy-and-topology model, the compiled artefacts preserve required shared-service reachability and remove forbidden cross-slice reachability. E6 further shows that the proposed condition is the only tested condition that satisfies both availability and isolation objectives simultaneously: the permissive condition preserves access but exposes forbidden paths, while deny-all blocks forbidden paths but removes required access.
 
 ### What RQ3 does not prove
 
 RQ3 does not prove runtime packet delivery, production scalability, runtime drift detection, cryptographic enforcement, xApp trustworthiness, full O-RAN security, or correctness for arbitrary large networks.
+
+## E6: controlled baseline comparison
+
+E6 compares three conditions while holding the source topology, eight-node set, two required queries, four forbidden queries, terminal-service query, and deterministic breadth-first verifier constant:
+
+- **Permissive topology-only:** each non-governance topology adjacency is available bidirectionally. Required shared-service paths remain available, but none of the four forbidden paths is blocked and the shared service can become transit.
+- **Deny-all:** all communication edges are removed. Forbidden paths are blocked, but both required shared-service paths are lost.
+- **Proposed compiled policy:** the five policy-permitted edges preserve both required paths, block all four forbidden paths, and keep `shared_auth_log` terminal.
+
+The comparison isolates a safety-availability trade-off inside the synthetic model. It does not compare the prototype with production O-RAN products or establish operational superiority. Primary outputs are `results/reports/baseline_comparison.json` and `results/reports/baseline_comparison.md`.
 
 ## Why the slice model is abstracted
 
@@ -458,6 +472,7 @@ Within the bounded local model, the repository demonstrates that:
 - forbidden cross-slice paths are absent
 - negative-control misconfigurations are detected
 - modest local proof-of-concept overhead can be reported
+- controlled baselines show that neither permissive connectivity nor deny-all satisfies the balanced objective
 
 ## What the repository does not prove
 
@@ -497,6 +512,8 @@ make compile
 make verify
 make test
 make experiments
+python experiments/run_e6_controlled_baselines.py
+python experiments/run_e5_repeated.py --warmups 5 --trials 30
 ```
 
 Inspect evidence:
@@ -505,6 +522,8 @@ Inspect evidence:
 cat results/reports/verification_report.md
 cat results/reports/experiment_summary.md
 cat results/metrics/overhead_metrics.json
+cat results/metrics/overhead_repeated.json
+cat results/reports/baseline_comparison.md
 ```
 
 ## One-line summary

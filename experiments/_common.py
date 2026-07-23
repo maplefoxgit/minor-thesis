@@ -48,6 +48,8 @@ METRICS_DIR = ROOT / "results" / "metrics"
 EXPERIMENT_SUMMARY_JSON = REPORTS_DIR / "experiment_summary.json"
 EXPERIMENT_SUMMARY_MD = REPORTS_DIR / "experiment_summary.md"
 OVERHEAD_METRICS_JSON = METRICS_DIR / "overhead_metrics.json"
+BASELINE_COMPARISON_JSON = REPORTS_DIR / "baseline_comparison.json"
+BASELINE_COMPARISON_MD = REPORTS_DIR / "baseline_comparison.md"
 GENERATED_POLICY_FILES = [
     OCLOUD_POLICY_FILENAME,
     ORAN_POLICY_FILENAME,
