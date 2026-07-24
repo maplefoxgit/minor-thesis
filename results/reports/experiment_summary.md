@@ -56,8 +56,8 @@
 - Graph size: nodes=8, edges=5
 - Generated rule count: 10
 - Peak Python tracemalloc bytes (max stage): 208418 bytes
-- Overall wall-clock time: 0.102597 seconds
-- Overall CPU time: 0.102258 seconds
+- Overall wall-clock time: 0.102943 seconds
+- Overall CPU time: 0.102932 seconds
 - Memory measurement basis: Python tracemalloc peak bytes (not process RSS)
 - Local overhead note: These measurements report modest local proof-of-concept overhead only. They do not establish production scalability.
 
