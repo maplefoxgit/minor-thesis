@@ -41,7 +41,7 @@ The repository implements a bounded policy pipeline:
    - one minimal slice-scoped O-RAN metadata artefact.
 4. Graph construction keeps only the topology edges that survive those policy artefacts.
 5. Verification checks required reachability, forbidden non-reachability, and terminal-service behavior.
-6. Experiments E1-E5 package the evidence into reproducible reports.
+6. Experiments E1 to E7 package validation, compilation, verification, controls, local overhead, and policy-file integrity into reproducible reports. Repeated E5, E6-P, and S1 separately characterise local performance or scale.
 
 ## How the current repository maps to this template
 
@@ -57,7 +57,13 @@ The repository implements a bounded policy pipeline:
 | Policy compilation | deterministic compiler | [`src/oran_slice_security/compiler.py`](../../src/oran_slice_security/compiler.py), [`policies/generated/`](../../policies/generated/) |
 | Graph building | surviving policy-and-topology graph | [`src/oran_slice_security/graph_builder.py`](../../src/oran_slice_security/graph_builder.py) |
 | Static verification | path checks and terminal-service checks | [`src/oran_slice_security/verifier.py`](../../src/oran_slice_security/verifier.py), [`results/reports/verification_report.md`](../../results/reports/verification_report.md) |
-| Evidence pack | E1-E5 experiments and reports | [`experiments/`](../../experiments/), [`results/reports/`](../../results/reports/), [`results/metrics/`](../../results/metrics/) |
+| Evidence pack | E1 to E7 experiments plus separate repeated E5, E6-P, and S1 characterisation | [`experiments/`](../../experiments/), [`results/reports/`](../../results/reports/), [`results/metrics/`](../../results/metrics/) |
+
+E1 to E4, E6, and E7 provide functional or security evidence. E5, E6-P, and S1 characterise local performance or scale and do not add a broader functional or security claim.
+
+E7 is a narrow policy-file consistency check. It does not provide manifest authentication, detection of coordinated policy and manifest tampering, protection against a change after the check, topology, query, or report binding, detection of a compromised compiler or verifier, or runtime drift observation.
+
+S1 bypasses the end-to-end intent schema, semantic validator, compiler, compiled-policy loader, and topology-to-policy graph builder. Those components remain fixed to two zones and one shared service.
 
 ## What can be customized safely
 

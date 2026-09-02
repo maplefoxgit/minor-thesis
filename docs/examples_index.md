@@ -26,6 +26,9 @@ All of these guides describe the same narrow repository claim:
 - static,
 - model-based,
 - proof-of-concept,
-- two slices,
+- an end-to-end pipeline fixed to two slices,
 - one shared service,
+- E5, E6-P, and S1 characterise local performance or scale and do not add a broader functional or security claim,
+- E7 does not provide manifest authentication, detection of coordinated policy and manifest tampering, protection against a change after the check, topology, query, or report binding, detection of a compromised compiler or verifier, or runtime drift observation,
+- S1 bypasses the intent schema, semantic validator, compiler, compiled-policy loader, and topology-to-policy graph builder,
 - no production-scale assurance claim.
