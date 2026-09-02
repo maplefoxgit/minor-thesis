@@ -1,0 +1,38 @@
+{
+  "experiment_id": "E7",
+  "title": "Post-compilation policy integrity",
+  "status": "pass",
+  "question": "Can a manifest-listed generated policy be changed after compilation without invalidating the verification evidence?",
+  "controlled_variables": {
+    "intent": "intents/two_slice_shared_auth_log.valid.yaml",
+    "topology": "topology/base_topology.yaml",
+    "queries": "verifier/queries/baseline_queries.yaml",
+    "compiler": "unchanged",
+    "verifier": "unchanged except for the manifest integrity gate",
+    "changed_factor": "bytes of one generated policy artefact"
+  },
+  "baseline": {
+    "integrity_status": "pass",
+    "verified_artifact_count": 3,
+    "verification_status": "pass"
+  },
+  "mutation": {
+    "artifact": "transport_policy.generated.json",
+    "description": "One trailing whitespace sequence was appended. The JSON remained valid and parsed to the same policy document.",
+    "manifest_sha256": "8fa30f637b66293d34e56d75f4fc6470fc455d7d9f4d987ef5f22b497ee571a5",
+    "mutated_sha256": "9e62e0192aafad950a58306a09fd1e37e66e99929f8e3689f9f4a32ca92ffaea",
+    "semantic_document_unchanged": true
+  },
+  "mutated_bundle": {
+    "result": "rejected",
+    "rejection_stage": "pre-graph integrity gate",
+    "reason": "compiled policy integrity check failed: transport_policy.generated.json: expected sha256=8fa30f637b66293d34e56d75f4fc6470fc455d7d9f4d987ef5f22b497ee571a5, actual sha256=9e62e0192aafad950a58306a09fd1e37e66e99929f8e3689f9f4a32ca92ffaea",
+    "pass_report_created": false
+  },
+  "clean_regeneration": {
+    "manifest_hashes_match_original": true,
+    "integrity_status": "pass",
+    "verification_status": "pass"
+  },
+  "interpretation_boundary": "E7 detects post-compilation byte changes to the three generated policy files listed in the retained manifest when the integrity gate executes. It does not authenticate the manifest, eliminate a concurrent check-to-use race, detect coordinated modification of both a policy and its manifest, bind topology, query, or report files to the same run, detect a compromised compiler or verifier, or observe runtime network drift."
+}

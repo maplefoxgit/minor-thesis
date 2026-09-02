@@ -1,6 +1,6 @@
 {
   "overall_status": "pass",
-  "pass_count": 6,
+  "pass_count": 7,
   "fail_count": 0,
   "experiments": {
     "E1": {
@@ -329,27 +329,51 @@
       "status": "pass",
       "validation_time": {
         "stage": "validation",
-        "wall_clock_seconds": 0.03989312506746501,
-        "cpu_seconds": 0.039888000000000035,
-        "peak_python_tracemalloc_bytes": 31049
+        "wall_clock_seconds": 0.010139749967493117,
+        "cpu_seconds": 0.010025000000000006,
+        "peak_python_tracemalloc_bytes": 24422,
+        "timing_basis": "one call measured without tracemalloc enabled",
+        "memory_basis": "a separate repeated call measured with tracemalloc enabled"
       },
       "compile_time": {
         "stage": "compile",
-        "wall_clock_seconds": 0.04297075001522899,
-        "cpu_seconds": 0.04296899999999998,
-        "peak_python_tracemalloc_bytes": 147602
+        "wall_clock_seconds": 0.012764457962475717,
+        "cpu_seconds": 0.012573,
+        "peak_python_tracemalloc_bytes": 32711,
+        "timing_basis": "one call measured without tracemalloc enabled",
+        "memory_basis": "a separate repeated call measured with tracemalloc enabled"
       },
       "graph_construction_time": {
         "stage": "graph_construction",
-        "wall_clock_seconds": 0.008680915925651789,
-        "cpu_seconds": 0.008678999999999992,
-        "peak_python_tracemalloc_bytes": 208258
+        "wall_clock_seconds": 0.004349666996859014,
+        "cpu_seconds": 0.0042279999999998985,
+        "peak_python_tracemalloc_bytes": 82853,
+        "timing_basis": "one call measured without tracemalloc enabled",
+        "memory_basis": "a separate repeated call measured with tracemalloc enabled"
+      },
+      "query_loading_time": {
+        "stage": "query_loading",
+        "wall_clock_seconds": 0.0011912500485777855,
+        "cpu_seconds": 0.0011430000000000051,
+        "peak_python_tracemalloc_bytes": 27812,
+        "timing_basis": "one call measured without tracemalloc enabled",
+        "memory_basis": "a separate repeated call measured with tracemalloc enabled"
       },
       "verification_time": {
         "stage": "verification",
-        "wall_clock_seconds": 0.011398375034332275,
-        "cpu_seconds": 0.011395999999999962,
-        "peak_python_tracemalloc_bytes": 208418
+        "wall_clock_seconds": 4.312500823289156e-05,
+        "cpu_seconds": 4.099999999995774e-05,
+        "peak_python_tracemalloc_bytes": 1936,
+        "timing_basis": "one call measured without tracemalloc enabled",
+        "memory_basis": "a separate repeated call measured with tracemalloc enabled"
+      },
+      "report_generation_time": {
+        "stage": "report_generation",
+        "wall_clock_seconds": 0.0007660420378670096,
+        "cpu_seconds": 0.0007639999999999869,
+        "peak_python_tracemalloc_bytes": 24666,
+        "timing_basis": "one call measured without tracemalloc enabled",
+        "memory_basis": "a separate repeated call measured with tracemalloc enabled"
       },
       "generated_policy_file_sizes_bytes": {
         "ocloud_microsegmentation.generated.yaml": 595,
@@ -365,11 +389,21 @@
       },
       "graph_node_count": 8,
       "graph_edge_count": 5,
-      "peak_python_tracemalloc_bytes_max": 208418,
+      "peak_python_tracemalloc_bytes_max": 82853,
       "memory_measurement_basis": "Python tracemalloc peak bytes (not process RSS)",
-      "overall_wall_clock_seconds": 0.10294316604267806,
-      "overall_cpu_seconds": 0.10293199999999997,
-      "local_overhead_statement": "These measurements report modest local proof-of-concept overhead only. They do not establish production scalability."
+      "overall_wall_clock_seconds": 0.029254292021505535,
+      "overall_cpu_seconds": 0.028773999999999855,
+      "measurement_boundaries": {
+        "validation_time": "Standalone schema, semantic intent, and topology validation.",
+        "compile_time": "Compiler entrypoint time, including its internal revalidation, policy serialization, file writing, and manifest writing.",
+        "graph_construction_time": "Topology loading, manifest integrity verification, policy loading and validation, and construction of the policy-filtered graph.",
+        "query_loading_time": "Loading and validation of the predefined verification queries.",
+        "verification_time": "Pure in-memory evaluation of the prebuilt graph and preloaded queries. It excludes graph construction, query loading, and report generation.",
+        "report_generation_time": "Serialization and writing of the JSON and Markdown verification reports.",
+        "overall_stage_sum": "Sum of validation, compilation, graph construction, query loading, pure verification, and report generation measurements. The explicit validation stage and compiler revalidation both occur, so the sum is the implemented pipeline sequence rather than six mutually exclusive algorithmic components.",
+        "timing_and_memory": "Timing calls run without tracemalloc. Peak Python allocation is measured in a separate repeated call for each stage."
+      },
+      "local_overhead_statement": "These measurements report local proof-of-concept overhead only. They do not establish production scalability."
     },
     "E6": {
       "experiment_id": "E6",
@@ -1078,9 +1112,47 @@
         "edge_reduction_vs_permissive_percentage": 50.0
       },
       "interpretation_boundary": "The comparison is controlled and deterministic within one synthetic eight-node model. It demonstrates the safety-availability trade-off of the three edge conditions, not superiority over production O-RAN policy systems."
+    },
+    "E7": {
+      "experiment_id": "E7",
+      "title": "Post-compilation policy integrity",
+      "status": "pass",
+      "question": "Can a manifest-listed generated policy be changed after compilation without invalidating the verification evidence?",
+      "controlled_variables": {
+        "intent": "intents/two_slice_shared_auth_log.valid.yaml",
+        "topology": "topology/base_topology.yaml",
+        "queries": "verifier/queries/baseline_queries.yaml",
+        "compiler": "unchanged",
+        "verifier": "unchanged except for the manifest integrity gate",
+        "changed_factor": "bytes of one generated policy artefact"
+      },
+      "baseline": {
+        "integrity_status": "pass",
+        "verified_artifact_count": 3,
+        "verification_status": "pass"
+      },
+      "mutation": {
+        "artifact": "transport_policy.generated.json",
+        "description": "One trailing whitespace sequence was appended. The JSON remained valid and parsed to the same policy document.",
+        "manifest_sha256": "8fa30f637b66293d34e56d75f4fc6470fc455d7d9f4d987ef5f22b497ee571a5",
+        "mutated_sha256": "9e62e0192aafad950a58306a09fd1e37e66e99929f8e3689f9f4a32ca92ffaea",
+        "semantic_document_unchanged": true
+      },
+      "mutated_bundle": {
+        "result": "rejected",
+        "rejection_stage": "pre-graph integrity gate",
+        "reason": "compiled policy integrity check failed: transport_policy.generated.json: expected sha256=8fa30f637b66293d34e56d75f4fc6470fc455d7d9f4d987ef5f22b497ee571a5, actual sha256=9e62e0192aafad950a58306a09fd1e37e66e99929f8e3689f9f4a32ca92ffaea",
+        "pass_report_created": false
+      },
+      "clean_regeneration": {
+        "manifest_hashes_match_original": true,
+        "integrity_status": "pass",
+        "verification_status": "pass"
+      },
+      "interpretation_boundary": "E7 detects post-compilation byte changes to the three generated policy files listed in the retained manifest when the integrity gate executes. It does not authenticate the manifest, eliminate a concurrent check-to-use race, detect coordinated modification of both a policy and its manifest, bind topology, query, or report files to the same run, detect a compromised compiler or verifier, or observe runtime network drift."
     }
   },
-  "bounded_claim": "The evidence supports only bounded, local, model-based validation, compilation, static non-reachability verification, negative-control rejection, controlled baseline comparison, and modest local overhead reporting.",
+  "bounded_claim": "The evidence supports only bounded, local, model-based validation, compilation, static non-reachability verification, negative-control rejection, controlled baseline comparison, post-compilation policy-integrity rejection, and local overhead reporting.",
   "result_files": {
     "verification_report_json": "results/reports/verification_report.json",
     "verification_report_md": "results/reports/verification_report.md",
@@ -1088,6 +1160,8 @@
     "experiment_summary_md": "results/reports/experiment_summary.md",
     "overhead_metrics_json": "results/metrics/overhead_metrics.json",
     "baseline_comparison_json": "results/reports/baseline_comparison.json",
-    "baseline_comparison_md": "results/reports/baseline_comparison.md"
+    "baseline_comparison_md": "results/reports/baseline_comparison.md",
+    "artifact_integrity_json": "results/reports/artifact_integrity.json",
+    "artifact_integrity_md": "results/reports/artifact_integrity.md"
   }
 }

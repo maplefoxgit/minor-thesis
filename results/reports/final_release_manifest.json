@@ -1,0 +1,42 @@
+{
+  "release_id": "sit746-evidence-2026-09-02",
+  "source_commit": "0cd37db614413f773faceb593e08bdb456b70e95",
+  "source_branch": "feature/sit746-final-evidence",
+  "source_tree_clean_before_measurement": true,
+  "environment": {
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "logical_cpu_count": 10,
+    "python_version": "3.12.13",
+    "python_implementation": "CPython"
+  },
+  "verification": {
+    "automated_test_command": ".venv/bin/python -m pytest -q",
+    "automated_test_result": "69 passed",
+    "experiment_command": ".venv/bin/python experiments/run_all_experiments.py",
+    "experiment_result": "7 passed, 0 failed",
+    "repeated_e5_protocol": "5 warm-up runs and 30 measured runs",
+    "repeated_e6_protocol": "5 warm-up batches and 30 measured batches per condition, 500 verifications per batch",
+    "scale_protocol": "5 warm-up runs, 30 measured runs, and 5 isolated resident-memory workers per size"
+  },
+  "claim_boundary": "The release supports bounded local model-based evidence. It does not establish live enforcement, production scalability, formal proof, runtime drift resistance, or a matched performance ranking against prior systems.",
+  "sha256": {
+    "results/metrics/overhead_metrics.json": "bf97b6fd0fca838c111c11099ccad4dced57c2d07f8f83c4becac7b6f712e8fe",
+    "results/metrics/overhead_repeated.json": "c57f6b56a61ae8b31fab84676214da48f2facbc56a24337058ddbc548d1374ef",
+    "results/metrics/overhead_repeated.csv": "9d4d39c3287f208224aeff4f5f10dc3030bb0170da4b3bc83572652b89d6f192",
+    "results/metrics/baseline_performance_repeated.json": "30a0cc65538121e6837e35d15b7783e39b1ff5db30acd7bbc99c5b155af8f47a",
+    "results/metrics/baseline_performance_repeated.csv": "16fb6681c20edb6d2699258f2eaadcaee0770502510ebb614bf20ec1b58c6711",
+    "results/metrics/multislice_verifier_scaling.json": "568f86fa7e1e0dd9758e10f5f47351d37b026aa20d8b4ee3950027cb0f9e6627",
+    "results/metrics/multislice_verifier_scaling.csv": "19eb322e99287f9c57a1df4df96623b62a45191e5ae0473682bd02ec51694d18",
+    "results/reports/experiment_summary.json": "ab0513405eee35b0b5bce178210d5cb0c9f88f52cbed7cc30c35f4f976460e3f",
+    "results/reports/experiment_summary.md": "2dfb3d296c8b87a7b6e4436db82522ab916aaa847c6f1824e2d265fbea76c89a",
+    "results/reports/artifact_integrity.json": "e9a1cc95f4425a7f06d30f9c6a775cdef462c9ea215acb66fbc2c59c1c4eebab",
+    "results/reports/artifact_integrity.md": "3e9e3ff0fd99570b8f9cc4c0222edddbb3dddeee51f0bd36e1277ae8ee8e39b8",
+    "results/reports/baseline_performance_repeated.md": "2d9832c63e5a61fef679ebff6881d3865f295909eb7ce35ad5019fe475427330",
+    "results/reports/multislice_verifier_scaling.md": "419bf487930e48ced5926c60eea0a9dbc23b6068521cdd5093a74cfbed6f79f6",
+    "results/reports/baseline_comparison.json": "472ec198abab118cd047423abe393e680064bf0fa8d79c6bac907c3e61da296d",
+    "results/reports/baseline_comparison.md": "73471776975daa9abfff05094ad273caf4acbca79d8645ab68ed5983a6fade94",
+    "results/reports/verification_report.json": "dc5ec05d831107da7243e68aa0c2637db9fcc1df0ab2a61c539644e6954508d9",
+    "results/reports/verification_report.md": "964389c3c560f7c7aaadaeca282a2151284f84d87e65eb3d86621bfe3bc0f398"
+  }
+}
