@@ -50,6 +50,8 @@ EXPERIMENT_SUMMARY_MD = REPORTS_DIR / "experiment_summary.md"
 OVERHEAD_METRICS_JSON = METRICS_DIR / "overhead_metrics.json"
 BASELINE_COMPARISON_JSON = REPORTS_DIR / "baseline_comparison.json"
 BASELINE_COMPARISON_MD = REPORTS_DIR / "baseline_comparison.md"
+ARTIFACT_INTEGRITY_JSON = REPORTS_DIR / "artifact_integrity.json"
+ARTIFACT_INTEGRITY_MD = REPORTS_DIR / "artifact_integrity.md"
 GENERATED_POLICY_FILES = [
     OCLOUD_POLICY_FILENAME,
     ORAN_POLICY_FILENAME,
@@ -152,12 +154,14 @@ def measure_stage(
     *args: Any,
     **kwargs: Any,
 ) -> tuple[Any, dict[str, Any]]:
-    tracemalloc.start()
     wall_start = time.perf_counter()
     cpu_start = time.process_time()
     result = func(*args, **kwargs)
     cpu_seconds = time.process_time() - cpu_start
     wall_seconds = time.perf_counter() - wall_start
+
+    tracemalloc.start()
+    func(*args, **kwargs)
     _, peak_memory = tracemalloc.get_traced_memory()
     tracemalloc.stop()
     metrics = {
@@ -165,6 +169,8 @@ def measure_stage(
         "wall_clock_seconds": wall_seconds,
         "cpu_seconds": cpu_seconds,
         "peak_python_tracemalloc_bytes": peak_memory,
+        "timing_basis": "one call measured without tracemalloc enabled",
+        "memory_basis": "a separate repeated call measured with tracemalloc enabled",
     }
     return result, metrics
 

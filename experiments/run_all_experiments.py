@@ -8,6 +8,8 @@ from _common import (
     OVERHEAD_METRICS_JSON,
     BASELINE_COMPARISON_JSON,
     BASELINE_COMPARISON_MD,
+    ARTIFACT_INTEGRITY_JSON,
+    ARTIFACT_INTEGRITY_MD,
     REPORTS_DIR,
     print_json,
     rel,
@@ -20,6 +22,7 @@ from run_e3_reachability_verification import run as run_e3
 from run_e4_negative_controls import run as run_e4
 from run_e5_overhead import run as run_e5
 from run_e6_controlled_baselines import run as run_e6
+from run_e7_artifact_integrity import run as run_e7
 
 
 EXPERIMENT_ORDER = [
@@ -29,6 +32,7 @@ EXPERIMENT_ORDER = [
     ("E4", run_e4),
     ("E5", run_e5),
     ("E6", run_e6),
+    ("E7", run_e7),
 ]
 
 
@@ -46,7 +50,8 @@ def run() -> dict[str, Any]:
         "bounded_claim": (
             "The evidence supports only bounded, local, model-based validation, compilation, "
             "static non-reachability verification, negative-control rejection, controlled "
-            "baseline comparison, and modest local overhead reporting."
+            "baseline comparison, post-compilation policy-integrity rejection, and local "
+            "overhead reporting."
         ),
         "result_files": {
             "verification_report_json": rel(REPORTS_DIR / "verification_report.json"),
@@ -56,6 +61,8 @@ def run() -> dict[str, Any]:
             "overhead_metrics_json": rel(OVERHEAD_METRICS_JSON),
             "baseline_comparison_json": rel(BASELINE_COMPARISON_JSON),
             "baseline_comparison_md": rel(BASELINE_COMPARISON_MD),
+            "artifact_integrity_json": rel(ARTIFACT_INTEGRITY_JSON),
+            "artifact_integrity_md": rel(ARTIFACT_INTEGRITY_MD),
         },
     }
     write_json(EXPERIMENT_SUMMARY_JSON, summary_document)
@@ -166,6 +173,28 @@ def render_experiment_summary_markdown(summary_document: dict[str, Any]) -> str:
                 f"`{result['comparison']['only_condition_satisfying_all_objectives']}`"
             )
 
+        if experiment_id == "E7":
+            mutation = result["mutation"]
+            mutated_bundle = result["mutated_bundle"]
+            lines.append(
+                f"- Baseline verification: `{result['baseline']['verification_status']}`; "
+                f"verified artifacts={result['baseline']['verified_artifact_count']}"
+            )
+            lines.append(
+                f"- Byte-only mutation: `{mutation['artifact']}`; "
+                f"parsed document unchanged=`{mutation['semantic_document_unchanged']}`"
+            )
+            lines.append(
+                f"- Mutated bundle: `{mutated_bundle['result']}` at "
+                f"`{mutated_bundle['rejection_stage']}`; "
+                f"pass report created=`{mutated_bundle['pass_report_created']}`"
+            )
+            lines.append(
+                "- Clean regeneration: "
+                f"hashes restored=`{result['clean_regeneration']['manifest_hashes_match_original']}`; "
+                f"verification=`{result['clean_regeneration']['verification_status']}`"
+            )
+
         lines.append("")
 
     lines.extend(
@@ -178,6 +207,8 @@ def render_experiment_summary_markdown(summary_document: dict[str, Any]) -> str:
             f"- Overhead metrics JSON: `{summary_document['result_files']['overhead_metrics_json']}`",
             f"- Baseline comparison JSON: `{summary_document['result_files']['baseline_comparison_json']}`",
             f"- Baseline comparison Markdown: `{summary_document['result_files']['baseline_comparison_md']}`",
+            f"- Artifact integrity JSON: `{summary_document['result_files']['artifact_integrity_json']}`",
+            f"- Artifact integrity Markdown: `{summary_document['result_files']['artifact_integrity_md']}`",
             "",
             "## Limitations",
             (

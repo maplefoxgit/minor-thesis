@@ -65,6 +65,8 @@ def test_experiment_reports_use_repository_relative_paths() -> None:
         "overhead_metrics_json": "results/metrics/overhead_metrics.json",
         "baseline_comparison_json": "results/reports/baseline_comparison.json",
         "baseline_comparison_md": "results/reports/baseline_comparison.md",
+        "artifact_integrity_json": "results/reports/artifact_integrity.json",
+        "artifact_integrity_md": "results/reports/artifact_integrity.md",
     }
 
 

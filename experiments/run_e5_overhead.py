@@ -18,8 +18,9 @@ from _common import (
 )
 from oran_slice_security.compiler import compile_policy_documents
 from oran_slice_security.graph_builder import build_graph_from_paths
+from oran_slice_security.report import write_verification_reports
 from oran_slice_security.validation import validate_intent_document, validate_topology_document
-from oran_slice_security.verifier import verify_from_paths
+from oran_slice_security.verifier import load_verification_queries, verify_graph
 
 
 def _validate_pipeline(schema: dict[str, Any], intent: dict[str, Any], topology: dict[str, Any]) -> None:
@@ -57,12 +58,21 @@ def run() -> dict[str, Any]:
             TOPOLOGY_PATH,
             policies_dir,
         )
+        queries_document, query_loading_metrics = measure_stage(
+            "query_loading",
+            load_verification_queries,
+            QUERIES_PATH,
+        )
         verification_report, verification_metrics = measure_stage(
             "verification",
-            verify_from_paths,
-            TOPOLOGY_PATH,
-            policies_dir,
-            QUERIES_PATH,
+            verify_graph,
+            graph,
+            queries_document,
+        )
+        _, report_generation_metrics = measure_stage(
+            "report_generation",
+            write_verification_reports,
+            verification_report,
             reports_dir,
         )
 
@@ -73,19 +83,25 @@ def run() -> dict[str, Any]:
         validation_metrics["peak_python_tracemalloc_bytes"],
         compile_metrics["peak_python_tracemalloc_bytes"],
         graph_metrics["peak_python_tracemalloc_bytes"],
+        query_loading_metrics["peak_python_tracemalloc_bytes"],
         verification_metrics["peak_python_tracemalloc_bytes"],
+        report_generation_metrics["peak_python_tracemalloc_bytes"],
     )
     overall_wall_clock_seconds = (
         validation_metrics["wall_clock_seconds"]
         + compile_metrics["wall_clock_seconds"]
         + graph_metrics["wall_clock_seconds"]
+        + query_loading_metrics["wall_clock_seconds"]
         + verification_metrics["wall_clock_seconds"]
+        + report_generation_metrics["wall_clock_seconds"]
     )
     overall_cpu_seconds = (
         validation_metrics["cpu_seconds"]
         + compile_metrics["cpu_seconds"]
         + graph_metrics["cpu_seconds"]
+        + query_loading_metrics["cpu_seconds"]
         + verification_metrics["cpu_seconds"]
+        + report_generation_metrics["cpu_seconds"]
     )
     status = (
         "pass"
@@ -102,7 +118,9 @@ def run() -> dict[str, Any]:
         "validation_time": validation_metrics,
         "compile_time": compile_metrics,
         "graph_construction_time": graph_metrics,
+        "query_loading_time": query_loading_metrics,
         "verification_time": verification_metrics,
+        "report_generation_time": report_generation_metrics,
         "generated_policy_file_sizes_bytes": file_sizes,
         "generated_rule_count": rule_counts["generated_rule_count"],
         "generated_rule_breakdown": rule_counts,
@@ -112,8 +130,42 @@ def run() -> dict[str, Any]:
         "memory_measurement_basis": "Python tracemalloc peak bytes (not process RSS)",
         "overall_wall_clock_seconds": overall_wall_clock_seconds,
         "overall_cpu_seconds": overall_cpu_seconds,
+        "measurement_boundaries": {
+            "validation_time": (
+                "Standalone schema, semantic intent, and topology validation."
+            ),
+            "compile_time": (
+                "Compiler entrypoint time, including its internal revalidation, policy "
+                "serialization, file writing, and manifest writing."
+            ),
+            "graph_construction_time": (
+                "Topology loading, manifest integrity verification, policy loading and "
+                "validation, and construction of the policy-filtered graph."
+            ),
+            "query_loading_time": (
+                "Loading and validation of the predefined verification queries."
+            ),
+            "verification_time": (
+                "Pure in-memory evaluation of the prebuilt graph and preloaded queries. "
+                "It excludes graph construction, query loading, and report generation."
+            ),
+            "report_generation_time": (
+                "Serialization and writing of the JSON and Markdown verification reports."
+            ),
+            "overall_stage_sum": (
+                "Sum of validation, compilation, graph construction, query loading, "
+                "pure verification, and report generation measurements. The explicit "
+                "validation stage and compiler revalidation both occur, so the sum is "
+                "the implemented pipeline sequence rather than six mutually exclusive "
+                "algorithmic components."
+            ),
+            "timing_and_memory": (
+                "Timing calls run without tracemalloc. Peak Python allocation is measured "
+                "in a separate repeated call for each stage."
+            ),
+        },
         "local_overhead_statement": (
-            "These measurements report modest local proof-of-concept overhead only. "
+            "These measurements report local proof-of-concept overhead only. "
             "They do not establish production scalability."
         ),
     }
