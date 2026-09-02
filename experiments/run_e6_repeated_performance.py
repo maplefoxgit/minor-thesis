@@ -102,7 +102,6 @@ def _measure_batch(
     queries_document: dict[str, Any],
     iterations: int,
 ) -> dict[str, Any]:
-    tracemalloc.start()
     wall_start = time.perf_counter()
     cpu_start = time.process_time()
     last_report: dict[str, Any] | None = None
@@ -110,6 +109,10 @@ def _measure_batch(
         last_report = verify_graph(graph, queries_document)
     cpu_seconds = time.process_time() - cpu_start
     wall_seconds = time.perf_counter() - wall_start
+
+    tracemalloc.start()
+    for _ in range(iterations):
+        verify_graph(graph, queries_document)
     _, peak_bytes = tracemalloc.get_traced_memory()
     tracemalloc.stop()
     if last_report is None:
@@ -276,8 +279,9 @@ def run(warmups: int, trials: int, iterations: int) -> dict[str, Any]:
         "measurement_boundary": (
             "Each retained value is the batch elapsed or processor time divided by the "
             "number of pure verify_graph calls. Graph construction, query loading, file "
-            "input and output, and report generation are excluded. Python tracemalloc "
-            "records the peak allocation during a whole batch and is not process memory."
+            "input and output, and report generation are excluded. Timing batches run "
+            "without tracemalloc. A separate repeated batch records peak Python allocation "
+            "and does not represent process memory."
         ),
         "comparison_boundary": (
             "The three local conditions can be compared with one another because their "

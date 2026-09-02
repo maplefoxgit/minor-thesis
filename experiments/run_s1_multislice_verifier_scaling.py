@@ -63,12 +63,14 @@ def _summary(values: Iterable[float | int]) -> dict[str, float | int]:
 
 
 def _measure(callable_: Callable[[], Any]) -> tuple[Any, dict[str, float | int]]:
-    tracemalloc.start()
     wall_start = time.perf_counter()
     cpu_start = time.process_time()
     value = callable_()
     cpu_seconds = time.process_time() - cpu_start
     wall_seconds = time.perf_counter() - wall_start
+
+    tracemalloc.start()
+    callable_()
     _, peak_bytes = tracemalloc.get_traced_memory()
     tracemalloc.stop()
     return value, {
@@ -349,6 +351,8 @@ def _write_outputs(document: dict[str, Any]) -> None:
                 "preloaded queries. Model-build time measures only this study's synthetic "
                 "fixture construction. Peak resident memory is the maximum for an isolated "
                 "Python worker that imports the package, builds one fixture, and verifies it. "
+                "Stage timing runs without tracemalloc, and Python allocation is profiled in "
+                "a separate repeated call. "
                 "Property criteria count reported outcomes. Path-search invocations count "
                 "every breadth-first search, including one terminal-service search per workload."
             ),
