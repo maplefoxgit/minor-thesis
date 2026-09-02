@@ -9,6 +9,7 @@ from .compiler import (
     ORAN_POLICY_FILENAME,
     TRANSPORT_POLICY_FILENAME,
 )
+from .integrity import verify_compiled_policy_manifest
 from .io import load_json_file, load_yaml_file
 from .models import TopologyModel
 from .validation import DocumentValidationError, validate_topology_document
@@ -77,6 +78,7 @@ class PolicyBundle:
 def load_compiled_policy_bundle(policies_directory: str | Path) -> PolicyBundle:
     """Load the three bounded compiled policy artefacts."""
     directory = Path(policies_directory)
+    verify_compiled_policy_manifest(directory)
     return PolicyBundle(
         transport_policy=load_json_file(directory / TRANSPORT_POLICY_FILENAME),
         ocloud_policy=load_yaml_file(directory / OCLOUD_POLICY_FILENAME),

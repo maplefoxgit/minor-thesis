@@ -16,9 +16,9 @@ In simpler terms:
 
 The three research questions remain distinct stages of one pipeline:
 
-- **RQ1 — Intent representation:** compact slice-security intent and schema validation.
-- **RQ2 — Policy compilation:** deterministic compiler producing three coordinated representational artefacts.
-- **RQ3 — Verification:** graph-based reachability checking over the compiled policy-and-topology model.
+- **RQ1: Intent representation:** compact slice-security intent and schema validation.
+- **RQ2: Policy compilation:** deterministic compiler producing three coordinated representational artefacts.
+- **RQ3: Verification:** graph-based reachability checking over the compiled policy-and-topology model.
 
 ## What this repository is trying to show
 
@@ -28,6 +28,7 @@ The repository demonstrates one bounded assurance workflow:
 slice-security intent
 → validation
 → policy compilation
+→ manifest-based policy integrity check
 → graph construction
 → reachability verification
 → evidence reports
@@ -55,6 +56,7 @@ flowchart LR
     D2["ocloud_microsegmentation.generated.yaml"]
     D3["oran_slice_policy.generated.json"]
 
+    I["Policy Integrity Gate<br/>Check manifest-listed policy bytes"]
     E["Topology + Policy Graph<br/>Combine topology and compiled artefacts"]
     F["RQ3<br/>Reachability Verifier<br/>Check what can reach what"]
     G["Results / Evidence<br/>Reports, experiments, overhead"]
@@ -70,9 +72,11 @@ flowchart LR
     C --> D2
     C --> D3
 
-    D1 --> E
-    D2 --> E
-    D3 --> E
+    D1 --> I
+    D2 --> I
+    D3 --> I
+
+    I --> E
 
     E --> F
     F --> P1
@@ -93,14 +97,14 @@ flowchart LR
     classDef result fill:#ede7f6,stroke:#6a1b9a,stroke-width:2px,color:#111;
 
     class A,C,F rq;
-    class B,E process;
+    class B,I,E process;
     class D1,D2,D3 artefact;
     class P1,P2 allow;
     class X1,X2 block;
     class G result;
 ```
 
-**Figure:** Mapping of the thesis research questions to the repository pipeline: RQ1 defines the intent, RQ2 compiles it into three representational artefacts, and RQ3 verifies the resulting policy-and-topology graph.
+**Figure:** Mapping of the thesis research questions to the repository pipeline: RQ1 defines the intent, RQ2 compiles it into three representational artefacts, and RQ3 checks policy-file integrity before verifying the resulting policy-and-topology graph.
 
 ## RQ1: compact machine-readable slice-security intent schema
 
@@ -140,6 +144,14 @@ python -m oran_slice_security validate-intent \
 python -m oran_slice_security validate-topology \
   --topology topology/base_topology.yaml
 ```
+
+Those commands check only the valid baseline intent and topology. Run the full E1 valid and invalid case set with:
+
+```bash
+python experiments/run_e1_schema_expressiveness.py
+```
+
+The individual E1 command prints JSON to standard output. `python experiments/run_all_experiments.py` retains the E1 result in the combined experiment summary.
 
 ### Evidence
 
@@ -200,6 +212,14 @@ python -m oran_slice_security compile \
   --out policies/generated
 ```
 
+Those commands create one generated bundle. Run the E2 coherence and repeated-hash checks with:
+
+```bash
+python experiments/run_e2_compiler_coherence.py
+```
+
+The individual E2 command writes the generated policy bundle and prints its result to standard output. `python experiments/run_all_experiments.py` retains the E2 result in the combined experiment summary.
+
 ### Evidence
 
 RQ2 is shown by:
@@ -212,6 +232,7 @@ RQ2 is shown by:
 - consistent O-Cloud labels
 - deterministic output hashes
 - conflict rejection
+- a manifest that records the expected SHA-256 digest for each of the three generated policy files
 
 Relevant outputs include:
 
@@ -221,6 +242,8 @@ Relevant outputs include:
 - `policies/generated/manifest.json`
 - `results/reports/experiment_summary.json`
 - `results/reports/experiment_summary.md`
+- `results/reports/artifact_integrity.json`
+- `results/reports/artifact_integrity.md`
 
 ### What RQ2 proves
 
@@ -243,15 +266,24 @@ The verifier checks whether:
 - the transport slice segments cannot directly reach each other
 - `shared_auth_log` cannot act as a bridge between slices
 
-### Main repo files
+### Main functional and security files
 
 - `src/oran_slice_security/graph_builder.py`
+- `src/oran_slice_security/integrity.py`
 - `src/oran_slice_security/verifier.py`
 - `src/oran_slice_security/report.py`
 - `verifier/queries/baseline_queries.yaml`
 - `topology/negative_controls/*.yaml`
 - `results/reports/verification_report.json`
 - `results/reports/verification_report.md`
+- `results/reports/artifact_integrity.json`
+
+### Performance and scale characterisation files
+
+- `src/oran_slice_security/scaling.py`
+- `results/metrics/overhead_repeated.json`
+- `results/metrics/baseline_performance_repeated.json`
+- `results/metrics/multislice_verifier_scaling.json`
 
 ### Demonstrated by
 
@@ -269,19 +301,21 @@ python -m oran_slice_security verify \
   --out results/reports
 ```
 
-The full evidence set can be generated with:
+Run the core pipeline, automated tests, and the E1 to E7 experiment pack with:
 
 ```bash
 make run-all
 ```
 
-or:
+Run only the E1 to E7 experiment pack with:
 
 ```bash
 python experiments/run_all_experiments.py
 ```
 
-### Evidence
+Repeated E5, E6-P, and S1 are separate performance and scale runs. They are not invoked by either command above.
+
+### Functional and security evidence
 
 RQ3 is shown by:
 
@@ -292,28 +326,49 @@ RQ3 is shown by:
 - `tn_segment_slice_a` cannot reach `tn_segment_slice_b`
 - `tn_segment_slice_b` cannot reach `tn_segment_slice_a`
 - `shared_auth_log` has no outgoing transit path
-- negative-control misconfigurations are rejected
-- overhead metrics are reported
+- five unsafe E4 topologies are rejected during validation and one over-restrictive topology is rejected during verification
 - the proposed condition is compared with permissive topology-only and deny-all controls
+- a byte-only change to a manifest-listed generated policy is rejected before graph construction
 
-Relevant outputs include:
+Relevant functional and security outputs include:
 
 - `results/reports/verification_report.json`
 - `results/reports/verification_report.md`
 - `results/reports/experiment_summary.json`
 - `results/reports/experiment_summary.md`
-- `results/metrics/overhead_metrics.json`
-- `results/metrics/overhead_repeated.json`
 - `results/reports/baseline_comparison.json`
 - `results/reports/baseline_comparison.md`
+- `results/reports/artifact_integrity.json`
+- `results/reports/artifact_integrity.md`
 
-### What RQ3 proves
+### Performance and scale characterisation
 
-RQ3 shows that, in the bounded local policy-and-topology model, the compiled artefacts preserve required shared-service reachability and remove forbidden cross-slice reachability. E6 further shows that the proposed condition is the only tested condition that satisfies both availability and isolation objectives simultaneously: the permissive condition preserves access but exposes forbidden paths, while deny-all blocks forbidden paths but removes required access.
+- E5 reports local pipeline timing and Python allocation for one host and one fixed workload.
+- E6-P reports pure verification time for the three E6 graph conditions without changing their functional result.
+- S1 measures generated verifier-only graphs representing 2, 3, 4, and 10 slices, with an injected forbidden route detected at every tested size.
+
+Relevant performance and scale outputs include:
+
+- `results/metrics/overhead_metrics.json`
+- `results/metrics/overhead_repeated.json`
+- `results/metrics/baseline_performance_repeated.json`
+- `results/metrics/baseline_performance_repeated.csv`
+- `results/reports/baseline_performance_repeated.md`
+- `results/metrics/multislice_verifier_scaling.json`
+- `results/metrics/multislice_verifier_scaling.csv`
+- `results/reports/multislice_verifier_scaling.md`
+
+### What the functional and security evidence shows
+
+RQ3 shows that, in the bounded local policy-and-topology model, the compiled artefacts preserve required shared-service reachability and remove forbidden cross-slice reachability. E6 further shows that the compiled-policy condition is the only tested condition that satisfies both availability and isolation objectives simultaneously: the permissive condition preserves access but exposes forbidden paths, while deny-all blocks forbidden paths but removes required access. E7 shows that a byte change to a manifest-listed policy is rejected before graph construction.
+
+### What the performance and scale evidence characterises
+
+E5 characterises local pipeline cost for one fixed workload. E6-P characterises pure verifier cost for the three E6 graph conditions. S1 characterises verification across four generated graph sizes. These measurements do not provide additional functional or security evidence and do not establish production scalability.
 
 ### What RQ3 does not prove
 
-RQ3 does not prove runtime packet delivery, production scalability, runtime drift detection, cryptographic enforcement, xApp trustworthiness, full O-RAN security, or correctness for arbitrary large networks.
+RQ3 does not prove runtime packet delivery, production scalability, runtime drift detection, authenticated manifest integrity, xApp trustworthiness, full O-RAN security, or correctness for arbitrary large networks. S1 bypasses the end-to-end intent schema, semantic validator, compiler, compiled-policy loader, and topology-to-policy graph builder.
 
 ## E6: controlled baseline comparison
 
@@ -324,6 +379,24 @@ E6 compares three conditions while holding the source topology, eight-node set, 
 - **Proposed compiled policy:** the five policy-permitted edges preserve both required paths, block all four forbidden paths, and keep `shared_auth_log` terminal.
 
 The comparison isolates a safety-availability trade-off inside the synthetic model. It does not compare the prototype with production O-RAN products or establish operational superiority. Primary outputs are `results/reports/baseline_comparison.json` and `results/reports/baseline_comparison.md`.
+
+## E6-P: repeated verification performance
+
+The retained E6-P study measures only the deterministic `verify_graph` call. Five warm-up batches precede 30 measured batches for each condition, with 500 verifications in each batch. Median verification time was 0.023750 milliseconds for the 10-edge permissive graph, 0.006054 milliseconds for the zero-edge deny-all graph, and 0.012360 milliseconds for the five-edge compiled-policy graph.
+
+These values characterise execution cost, not functional or security effectiveness. The separate E6 comparison establishes the functional result: the permissive condition fails the forbidden-path and terminal-service criteria, deny-all fails required reachability, and the compiled-policy condition alone satisfies all criteria. Primary E6-P outputs are `results/metrics/baseline_performance_repeated.json`, `results/metrics/baseline_performance_repeated.csv`, and `results/reports/baseline_performance_repeated.md`.
+
+## E7: post-compilation policy integrity
+
+E7 tests the handoff from generated policy files to graph construction. The clean three-policy bundle passes both the manifest check and verification. A whitespace-only byte change to the transport policy leaves its parsed JSON meaning unchanged but changes its SHA-256 digest. The integrity gate rejects that bundle before graph construction and does not write a passing verification report. Clean regeneration restores the original policy hashes and the passing result.
+
+This is a narrow file-consistency check. It does not provide manifest authentication, detection of coordinated policy and manifest tampering, protection against a change after the check, topology, query, or report binding, detection of a compromised compiler or verifier, or runtime drift observation. Primary outputs are `results/reports/artifact_integrity.json` and `results/reports/artifact_integrity.md`.
+
+## S1: bounded verifier-only scale study
+
+S1 generates in-memory graphs representing 2, 3, 4, and 10 slices while leaving the verifier logic fixed. The measured cases range from 8 nodes, 5 edges, 7 criteria, and 8 path searches at 2 slices to 32 nodes, 21 edges, 191 criteria, and 200 path searches at 10 slices. Median verification time rises from 0.0150415 milliseconds to 0.2779585 milliseconds across that range. The condition medians for worker peak process resident memory range from 32.4375 to 32.609375 mebibytes. An injected forbidden route is detected at every tested size.
+
+S1 bypasses the end-to-end intent schema, semantic validator, compiler, compiled-policy loader, and topology-to-policy graph builder. Those components remain bounded to two slices. No capacity breaking point is claimed because no time or memory failure threshold was declared before the run. Primary outputs are `results/metrics/multislice_verifier_scaling.json`, `results/metrics/multislice_verifier_scaling.csv`, and `results/reports/multislice_verifier_scaling.md`.
 
 ## Why the slice model is abstracted
 
@@ -436,27 +509,34 @@ flowchart TD
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Intent representation | ✓ compact slice-security intent | ✓ slicing/SLA intent | ✓ higher-level slice request | ✓ security intent | △ intent-specific verification target | △ slicing use-case framing | △ isolation objective | △ access-control or zero-trust intent |
 | Safety / semantic validation | ✓ schema and semantic validation | ✓ contract validation | △ orchestration-side validation | ✓ conflict/invariant checking | △ verifier-side checks | △ platform validation | △ PoC validation | △ policy validation |
-| Policy compilation | ✓ deterministic compiler | △ intent-to-action translation | ✓ multi-domain artefact generation | ✓ intent-to-policy translation | — | △ slicing/control configuration | — | △ policy derivation/enforcement configuration |
-| Multi-domain slice artefacts | ✓ transport + O-Cloud + O-RAN metadata | △ O-RAN actuation path | ✓ core strength | △ controller-level policies | — | ✓ practical slicing artefacts | ✓ RAN/TN/5GC isolation setup | △ multi-layer enforcement rather than slice artefacts |
-| O-Cloud micro-segmentation / zero trust | ✓ representational O-Cloud micro-segmentation | — | △ domain coordination only | △ security-policy viewpoint | — | — | △ isolation motivation | ✓ core emphasis |
-| Reachability or invariant verification | ✓ graph reachability checks | △ safety guardrail | — | ✓ bounded checking/invariants | ✓ strong reachability verification | — | — | △ policy/access-control verification |
+| Policy compilation | ✓ deterministic compiler | △ intent-to-action translation | ✓ multi-domain artefact generation | ✓ intent-to-policy translation | None | △ slicing/control configuration | None | △ policy derivation/enforcement configuration |
+| Multi-domain slice artefacts | ✓ transport + O-Cloud + O-RAN metadata | △ O-RAN actuation path | ✓ core strength | △ controller-level policies | None | ✓ practical slicing artefacts | ✓ RAN/TN/5GC isolation setup | △ multi-layer enforcement rather than slice artefacts |
+| O-Cloud micro-segmentation / zero trust | ✓ representational O-Cloud micro-segmentation | None | △ domain coordination only | △ security-policy viewpoint | None | None | △ isolation motivation | ✓ core emphasis |
+| Reachability or invariant verification | ✓ graph reachability checks | △ safety guardrail | None | ✓ bounded checking/invariants | ✓ strong reachability verification | None | None | △ policy/access-control verification |
 | Prototype / testbed evaluation | ✓ bounded local PoC and evidence pipeline | ✓ O-RAN slicing prototype/testbed | ✓ platform/prototype | ✓ prototype and formal evaluation | ✓ experimental evaluation | ✓ open-source platform/testbed | ✓ practical PoC | ✓ prototype/performance evaluation |
-| Runtime monitoring / future work | Not part of the core claim; treated as future work or optional extension | △ runtime/agentic actuation context | ✓ orchestration/runtime orientation | △ controller/runtime policy context | △ operational verification context | ✓ live slicing platform context | △ deployment context | ✓ enforcement/runtime control context |
+| Runtime monitoring / future work | Not part of the core claim; E7 checks policy files before graph construction only | △ runtime/agentic actuation context | ✓ orchestration/runtime orientation | △ controller/runtime policy context | △ operational verification context | ✓ live slicing platform context | △ deployment context | ✓ enforcement/runtime control context |
 
-Legend: ✓ = strong resemblance, △ = partial resemblance, — = not a major emphasis.
+Legend: ✓ = strong resemblance, △ = partial resemblance, None = not a major emphasis.
 
 ## Evidence style and evaluation logic
 
 The evidence style used in this thesis is consistent with bounded systems and design-science research. Comparable systems papers often rely on bounded prototypes, emulated or testbed environments, generated artefacts, validation steps, negative or unsafe cases, performance or overhead measurements, and explicit limitation statements.
 
-The evidence style here is model-based and bounded rather than production-operational. The repository does not try to prove deployment realism across a full O-RAN stack. Its evidence is deliberately compact:
+The functional and security evidence is model-based and bounded rather than production-operational:
 
 - schema and semantic validation for a bounded slice-security intent
 - deterministic compilation into exactly three coordinated representational artefacts
 - a policy-and-topology graph built after compilation
 - static reachability checks for required and forbidden paths
 - negative controls showing that unsafe or inconsistent cases are rejected
-- modest local overhead reporting with explicit limitations
+- an E6 functional comparison of three controlled graph conditions
+- an E7 pre-graph integrity test for manifest-listed generated policy files
+
+Performance and scale are characterised separately through:
+
+- retained repeated E5 timing and Python allocation evidence for one host and one fixed workload
+- E6-P pure-verification timing for the three E6 graph conditions
+- an S1 verifier-only study over generated graphs representing 2, 3, 4, and 10 slices
 
 This narrower evidence style is a feature of the thesis framing, not a weakness in itself. It matches the bounded claim: one reproducible static assurance workflow for one cross-slice non-reachability property in a small O-RAN-aligned proof of concept.
 
@@ -471,8 +551,12 @@ Within the bounded local model, the repository demonstrates that:
 - required paths to `shared_auth_log` are preserved
 - forbidden cross-slice paths are absent
 - negative-control misconfigurations are detected
-- modest local proof-of-concept overhead can be reported
 - controlled baselines show that neither permissive connectivity nor deny-all satisfies the balanced objective
+- a byte-only change to a manifest-listed generated policy is rejected before graph construction
+
+## What the measurements characterise
+
+The measurement studies report local proof-of-concept timing and Python allocation with explicit boundaries. E6-P characterises pure verification cost for the three controlled E6 conditions. S1 characterises the verifier across four generated graph sizes and confirms that its injected forbidden route is detected at each size. These studies do not add a broader functional or security claim.
 
 ## What the repository does not prove
 
@@ -483,7 +567,7 @@ The repository does not claim:
 - full 3GPP or O-RAN slice lifecycle modelling
 - live RIC, xApp, or rApp enforcement
 - Kubernetes or container-platform enforcement
-- cryptographic protection
+- authenticated cryptographic protection
 - runtime packet delivery guarantees
 - runtime drift detection
 - fronthaul confidentiality
@@ -497,7 +581,7 @@ The claim is intentionally narrower:
 
 ## Quick command summary
 
-Install and run the full workflow:
+Install and run the core pipeline, automated tests, and E1 to E7 experiment pack:
 
 ```bash
 make install
@@ -514,6 +598,9 @@ make test
 make experiments
 python experiments/run_e6_controlled_baselines.py
 python experiments/run_e5_repeated.py --warmups 5 --trials 30
+python experiments/run_e6_repeated_performance.py --warmups 5 --trials 30 --iterations 500
+python experiments/run_e7_artifact_integrity.py
+python experiments/run_s1_multislice_verifier_scaling.py --slices 2 3 4 10 --warmups 5 --trials 30 --rss-trials 5
 ```
 
 Inspect evidence:
@@ -524,7 +611,13 @@ cat results/reports/experiment_summary.md
 cat results/metrics/overhead_metrics.json
 cat results/metrics/overhead_repeated.json
 cat results/reports/baseline_comparison.md
+cat results/metrics/baseline_performance_repeated.json
+cat results/reports/artifact_integrity.md
+cat results/reports/multislice_verifier_scaling.md
+cat results/reports/final_release_manifest.md
 ```
+
+The final release manifest is a retained record and is not regenerated by these commands. Verify the intended release tag and retained manifest before rerunning commands that overwrite generated reports. Exact timing values and result-file hashes can differ on another host or software environment.
 
 ## One-line summary
 

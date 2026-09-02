@@ -1,4 +1,4 @@
-.PHONY: install test validate compile verify experiments run-all clean-generated
+.PHONY: install test validate compile verify integrity baseline-performance scale experiments run-all clean-generated
 
 VENV := .venv
 PYTHON := $(VENV)/bin/python
@@ -25,6 +25,15 @@ compile: $(INSTALL_STAMP)
 
 verify: $(INSTALL_STAMP)
 	$(PYTHON) -m oran_slice_security verify --topology topology/base_topology.yaml --policies policies/generated --queries verifier/queries/baseline_queries.yaml --out results/reports
+
+integrity: $(INSTALL_STAMP)
+	$(PYTHON) experiments/run_e7_artifact_integrity.py
+
+baseline-performance: $(INSTALL_STAMP)
+	$(PYTHON) experiments/run_e6_repeated_performance.py
+
+scale: $(INSTALL_STAMP)
+	$(PYTHON) experiments/run_s1_multislice_verifier_scaling.py
 
 experiments: $(INSTALL_STAMP)
 	$(PYTHON) experiments/run_all_experiments.py

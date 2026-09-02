@@ -26,7 +26,14 @@ from pathlib import Path
 from typing import Any, Iterable
 
 
-STAGES = ("validation_time", "compile_time", "graph_construction_time", "verification_time")
+STAGES = (
+    "validation_time",
+    "compile_time",
+    "graph_construction_time",
+    "query_loading_time",
+    "verification_time",
+    "report_generation_time",
+)
 METRICS = ("wall_clock_seconds", "cpu_seconds", "peak_python_tracemalloc_bytes")
 
 
@@ -220,6 +227,10 @@ def main() -> int:
             field: values[0] for field, values in invariant_values.items()
         },
         "memory_measurement_basis": "Python tracemalloc peak bytes (not process RSS)",
+        "profiling_protocol": (
+            "Each stage timing is measured without tracemalloc. Each stage is then "
+            "repeated separately with tracemalloc enabled to obtain its Python allocation peak."
+        ),
         "summary": summaries,
         "trials": [_flatten_trial(index + 1, trial) for index, trial in enumerate(measured)],
         "timing_definitions": {
@@ -228,8 +239,10 @@ def main() -> int:
                 "temporary-directory work, metric aggregation, and JSON writing."
             ),
             "summed_stage_wall_clock_seconds": (
-                "Sum of the four stage timings reported by the existing E5 implementation; "
-                "this excludes work performed between measured stages."
+                "Sum of the six stage timings reported by the E5 implementation: "
+                "validation, compilation, graph construction, query loading, pure "
+                "verification, and report generation. This excludes work performed "
+                "between measured stages."
             ),
         },
         "interpretation_boundary": (
@@ -244,7 +257,11 @@ def main() -> int:
 
     rows = output["trials"]
     with csv_path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(rows[0].keys()))
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=list(rows[0].keys()),
+            lineterminator="\n",
+        )
         writer.writeheader()
         writer.writerows(rows)
 
@@ -254,9 +271,9 @@ def main() -> int:
     print(
         "  wall clock: "
         f"median={summary['end_to_end_wall_clock_seconds']['median']:.6f}s, "
-        f"IQR={summary['end_to_end_wall_clock_seconds']['q1']:.6f}–"
+        f"IQR={summary['end_to_end_wall_clock_seconds']['q1']:.6f} to "
         f"{summary['end_to_end_wall_clock_seconds']['q3']:.6f}s, "
-        f"range={summary['end_to_end_wall_clock_seconds']['min']:.6f}–"
+        f"range={summary['end_to_end_wall_clock_seconds']['min']:.6f} to "
         f"{summary['end_to_end_wall_clock_seconds']['max']:.6f}s"
     )
     print(
@@ -266,7 +283,7 @@ def main() -> int:
     print(
         "  peak tracemalloc: "
         f"median={summary['peak_python_tracemalloc_bytes_max']['median']:.0f}B, "
-        f"IQR={summary['peak_python_tracemalloc_bytes_max']['q1']:.0f}–"
+        f"IQR={summary['peak_python_tracemalloc_bytes_max']['q1']:.0f} to "
         f"{summary['peak_python_tracemalloc_bytes_max']['q3']:.0f}B"
     )
     print(f"  wrote: {json_path}")

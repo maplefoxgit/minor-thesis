@@ -51,7 +51,7 @@ flowchart LR
     Policies["4. Policies<br/>Transport + O-Cloud + O-RAN metadata"]:::files
     PathGraph["5. Graph<br/>Build a small map of surviving paths"]:::graphStep
     Verify["6. Verifier<br/>Check allowed and blocked paths"]:::check
-    Results["7. Results<br/>Reports + E1-E5 evidence"]:::result
+    Results["7. Results<br/>E1 to E7 + E6-P + S1"]:::result
 
     Intent --> Validate --> Compile --> Policies --> PathGraph --> Verify --> Results
 
@@ -106,7 +106,7 @@ flowchart LR
 | Generated policies | You get transport rules, O-Cloud workload rules, and minimal O-RAN slice metadata. | [`policies/generated/transport_policy.generated.json`](../../policies/generated/transport_policy.generated.json), [`policies/generated/ocloud_microsegmentation.generated.yaml`](../../policies/generated/ocloud_microsegmentation.generated.yaml), [`policies/generated/oran_slice_policy.generated.json`](../../policies/generated/oran_slice_policy.generated.json) | These are the machine-readable outputs that the verifier reasons over. |
 | Graph builder | The repository keeps only the paths that survive both the topology and the compiled policies. | [`src/oran_slice_security/graph_builder.py`](../../src/oran_slice_security/graph_builder.py) | This turns the policy question into a clean path question. |
 | Verifier | The repository checks required paths, forbidden paths, and the "shared service must stay terminal" rule. | [`src/oran_slice_security/verifier.py`](../../src/oran_slice_security/verifier.py), [`verifier/queries/baseline_queries.yaml`](../../verifier/queries/baseline_queries.yaml) | This is the core bounded static assurance step. |
-| Experiments | The repository packages validation, compilation, verification, negative controls, and overhead checks into E1-E5. | [`experiments/`](../../experiments/) | This creates the thesis evidence pack. |
+| Experiments | E1 to E7 cover the main experiment pack. Repeated E5, E6-P, and S1 separately characterise local performance or scale. | [`experiments/`](../../experiments/) | This keeps functional and security results separate from performance and scale measurements. |
 | Results | The repository writes human-readable and machine-readable reports. | [`results/reports/`](../../results/reports/), [`results/metrics/`](../../results/metrics/) | This is what you inspect, cite, and reproduce. |
 
 ## How it works, step by step
@@ -183,18 +183,31 @@ It also checks that the shared service is terminal and not acting like a forward
 
 ### 8. Experiments and results
 
-The experiments package everything into bounded evidence:
+The functional and security evidence is:
 
 - E1 checks schema expressiveness.
 - E2 checks compiler coherence.
 - E3 checks reachability and non-reachability.
-- E4 checks negative controls.
-- E5 records modest local overhead metrics.
+- E4 rejects five unsafe topologies during validation and one over-restrictive topology during verification.
+- E6 compares the functional results for permissive, deny-all, and compiled-policy graph conditions.
+- E7 checks that a byte change to a manifest-listed generated policy is rejected before graph construction.
+
+E7 does not provide manifest authentication, detection of coordinated policy and manifest tampering, protection against a change after the check, topology, query, or report binding, detection of a compromised compiler or verifier, or runtime drift observation.
+
+The performance and scale characterisation is:
+
+- E5 and its retained repeated run report descriptive local timing and Python allocation for one host and one fixed workload.
+- E6-P measures pure verification time for the three E6 graph conditions without changing their functional result.
+- S1 measures generated verifier-only graphs representing 2, 3, 4, and 10 slices and injects one forbidden route at each size.
+
+S1 bypasses the end-to-end intent schema, semantic validator, compiler, compiled-policy loader, and topology-to-policy graph builder. Those components remain fixed to the two-slice scenario.
 
 You can see the current human-readable outputs in:
 
 - [`results/reports/verification_report.md`](../../results/reports/verification_report.md)
 - [`results/reports/experiment_summary.md`](../../results/reports/experiment_summary.md)
+- [`results/reports/baseline_performance_repeated.md`](../../results/reports/baseline_performance_repeated.md)
+- [`results/reports/multislice_verifier_scaling.md`](../../results/reports/multislice_verifier_scaling.md)
 
 ## Why each part matters
 
