@@ -295,7 +295,11 @@ def run(warmups: int, trials: int, iterations: int) -> dict[str, Any]:
     MARKDOWN_PATH.parent.mkdir(parents=True, exist_ok=True)
     JSON_PATH.write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")
     with CSV_PATH.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(rows[0].keys()))
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=list(rows[0].keys()),
+            lineterminator="\n",
+        )
         writer.writeheader()
         writer.writerows(rows)
     MARKDOWN_PATH.write_text(_render_markdown(document), encoding="utf-8")

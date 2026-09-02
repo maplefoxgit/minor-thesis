@@ -307,7 +307,11 @@ def _write_outputs(document: dict[str, Any]) -> None:
             }
         )
     with CSV_PATH.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(flat_rows[0].keys()))
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=list(flat_rows[0].keys()),
+            lineterminator="\n",
+        )
         writer.writeheader()
         writer.writerows(flat_rows)
 
